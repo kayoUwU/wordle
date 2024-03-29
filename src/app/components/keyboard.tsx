@@ -1,18 +1,20 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import styles from "./keyboard.module.css";
-import { KEY_TEXT, KeyObjType } from "@/lib/keyCode";
+import { KeyObjType } from "@/lib/keyCode";
 import { ResultType } from "@/entity/enum/resultType";
 
 function Keyboard({
   onKeyDown,
   keyStatus,
+  keyArr
 }: {
   onKeyDown: (key: string) => void;
   keyStatus: KeyObjType;
+  keyArr : string[][]
 }) {
-  return (
-    <div className={styles.keyboard}>
-      {KEY_TEXT.map((row, index) => {
+  const keyboard = useMemo(
+    () =>
+    keyArr.map((row, index) => {
         return (
           <div key={index} className={styles.keyboard_row}>
             {row.map((item) => {
@@ -30,9 +32,10 @@ function Keyboard({
             })}
           </div>
         );
-      })}
-    </div>
+      }),
+    [keyArr, keyStatus, onKeyDown]
   );
+  return <div className={styles.keyboard}>{keyboard}</div>;
 }
 
 export default memo(Keyboard);

@@ -6,6 +6,7 @@
     background-color: chocolate;
     border-radius: 10px;
     border: 2px solid #414458;
+    box-shadow: 2px 2px 4px #414458;
 }
 
 .keyboard_row {

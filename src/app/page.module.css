@@ -3,6 +3,13 @@
   text-align: center;
 }
 
+.title > img {
+  display: inline-block;
+  vertical-align: text-bottom;
+  width: 80px;
+  height: 80px;
+}
+
 .wordle_area {
   position: relative;
   display: grid;
@@ -49,6 +56,22 @@
   }
 
   .title {
-    font-size: 2.5em;
+    font-size: 2em;
+  }
+
+  .title > img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .wordle_area {
+    min-width: 200px;
+    min-height: 240x;
+  }
+
+  .wordle_area > div {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 1em;
   }
 }

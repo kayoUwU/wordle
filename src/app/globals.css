@@ -48,3 +48,9 @@ main {
     color-scheme: dark;
   }
 }
+
+@media (max-width: 640px) {
+  main {
+    padding: 30px 0px;
+  }
+}
