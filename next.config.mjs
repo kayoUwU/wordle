@@ -13,6 +13,7 @@ const configFunc = (phase, _) => {
         if(process.env.USE_EXPORT==='true'){
             config.output = 'export';
             config.distDir = 'out';
+            config.images = { unoptimized: true };
         }
         if (process.env.NEXT_PUBLIC_BASE_PATH && process.env.NEXT_PUBLIC_BASE_PATH.trim() !== '') {
             config.basePath = process.env.NEXT_PUBLIC_BASE_PATH;

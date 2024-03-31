@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "17b2dcb0-6104-4034-878e-7b9e21d1514e",
+		"name": "wordle",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33909604"
+	},
+	"item": [
+		{
+			"name": "Validate Wordle Guess",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"guess\": \"water\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://wordle-apis.vercel.app/api/validate",
+					"protocol": "https",
+					"host": [
+						"wordle-apis",
+						"vercel",
+						"app"
+					],
+					"path": [
+						"api",
+						"validate"
+					]
+				},
+				"description": "response:\n\n```\n{ \n  ”isvalidword” : Boolean, \n  ”score” : [ 0−2, 0−2, 0−2, 0−2, 0−2 ] \n} \n\n ```\n\n- The is valid word key is true if the guessed word is in the English dictionary otherwise it’s false. When is valid word is false, score is an empty array.\n- The score array is an array of numbers with values ranging from 0 to 2. The array’s index corresponds to the index of the word the player guessed. For example, score\\[0\\] is the score for the character at index 0 for the word they guessed.The score values are explained below:\n    \n    - 0 - Character is not in the word\n    - 1 - Character is in the word but not in the correct position\n    - 2 - Character is in the word and in the correct position"
+			},
+			"response": [
+				{
+					"name": "doc",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"guess\": \"guess\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://wordle-apis.vercel.app/api/validate",
+							"protocol": "https",
+							"host": [
+								"wordle-apis",
+								"vercel",
+								"app"
+							],
+							"path": [
+								"api",
+								"validate"
+							]
+						}
+					},
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json",
+							"name": "Content-Type",
+							"description": "",
+							"type": "text"
+						}
+					],
+					"cookie": [],
+					"body": "{ \r\n  \"isvalidword\" : true, \r\n  \"score\" : [ 0,1,2,0,1] \r\n} "
+				},
+				{
+					"name": "Validate Wordle Guess",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"guess\": \"water\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://wordle-apis.vercel.app/api/validate",
+							"protocol": "https",
+							"host": [
+								"wordle-apis",
+								"vercel",
+								"app"
+							],
+							"path": [
+								"api",
+								"validate"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "public, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Content-Length",
+							"value": "42"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 28 Mar 2024 17:20:26 GMT"
+						},
+						{
+							"key": "Etag",
+							"value": "W/\"2a-hqbHZ+tuTuKcEbbiy8lGEyQXjpY\""
+						},
+						{
+							"key": "Server",
+							"value": "Vercel"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=63072000; includeSubDomains; preload"
+						},
+						{
+							"key": "X-Vercel-Cache",
+							"value": "MISS"
+						},
+						{
+							"key": "X-Vercel-Id",
+							"value": "cle1::iad1::j4fdd-1711646425721-e7f655827eca"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"is_valid_word\": true,\n    \"score\": [\n        0,\n        1,\n        0,\n        1,\n        0\n    ]\n}"
+				}
+			]
+		}
+	]
+}

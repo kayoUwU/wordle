@@ -30,4 +30,9 @@
     .keyboard_row>div {
         font-size: 1em;
     }
+
+    .keyboard {
+        padding: 5px, 1px;
+        width: 100%;
+    }
 }

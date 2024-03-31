@@ -1,6 +1,6 @@
 This a ui project for Wordle Game.
 
-## How to run
+## How to run in local
 1. install NodeJs
 - Currently, I use [v20.11.0](https://nodejs.org/en/blog/release/v20.11.0)
 
@@ -34,21 +34,15 @@ yarn start
 ```
 After Serving, Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-\
-**For production mode**: export static page and serve
-1. create `.env.local` with the following content:
-```conf
-USE_EXPORT=true
-```
-2. build and serve
+**For static page**: export static page and serve
 - run the follow in terminal:
 ```bash
-yarn build
+yarn export
 yarn serve
 ```
 After Serving, Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. 
 
-## How to Deploy in Github
+## Deploy in Github
 1. create `production` enviornment variable 
     - `WEB_BASE_PATH` with base path of this github page (i.e. `/wordle`).
 2. Run Github action `Deploy Next.js site to Pages`
