@@ -1,9 +1,13 @@
 .title {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-content: center;
   font-size: 3em;
   text-align: center;
 }
 
-.title > img {
+.title img {
   display: inline-block;
   vertical-align: text-bottom;
   width: 80px;
@@ -12,17 +16,18 @@
 
 .wordle_area {
   position: relative;
+  align-self: center;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-columns: repeat(var(--max-column), 1fr);
+  grid-template-rows: repeat(var(--max-row), 1fr);
   gap: 5px;
   height: auto;
-  min-width: 320px;
-  min-height: 384px;
+  min-width: calc((60px+5px) * var(--max-column));
+  min-height: calc((60px+5px) * var(--max-row));
   padding: 10px;
 }
 
-.wordle_area > div {
+.word {
   background-color: transparent;
   min-width: 64px;
   min-height: 64px;
@@ -36,10 +41,31 @@
   align-content: center;
 }
 
-.wordle_area > div.active {
-  border: 1px solid chocolate;
+.word.active {
+  border-color: chocolate;
+}
+
+.word.active_word {
   background-color: chocolate;
 }
+
+.word{
+  transition: background-color 300ms linear, border-color 300ms linear;
+}
+
+.result {
+  align-self: center;
+
+  border-radius: 10px;
+  padding: 5px;
+
+  text-align: center;
+  font-weight: bold;
+  background-color:bisque;
+  color: black;
+  opacity: 0;
+}
+
 
 .author {
   text-decoration: none;
@@ -48,30 +74,37 @@
   padding: 10px;
 }
 
-@media (max-width: 640px) {
+@media (min-height: 1024px) {
+  .wordle_area {
+    min-width: calc((100px+5px) * var(--max-column));
+    min-height: calc((100px+5px) * var(--max-row));
+  }
+
+  .word {
+    min-width: 100px;
+    min-height: 100px;
+  }
+}
+
+@media (max-height: 768px), (max-width: 640px) {
   .author {
     position: absolute;
     top: 0;
     right: 0;
   }
+}
 
-  .title {
-    font-size: 2em;
-  }
-
-  .title > img {
-    width: 60px;
-    height: 60px;
-  }
-
+@media (max-width: 640px) {
   .wordle_area {
-    min-width: 200px;
-    min-height: 240x;
+    flex: 2;
+    align-self:normal;
+    padding: 20px;
+    min-width: calc((45px+5px) * var(--max-column));
+    min-height: calc((45px+5px) * var(--max-row));
   }
 
-  .wordle_area > div {
-    min-width: 40px;
-    min-height: 40px;
-    font-size: 1em;
+  .word {
+    min-width: 45px;
+    min-height: 45px;
   }
 }

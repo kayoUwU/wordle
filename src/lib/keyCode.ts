@@ -1,4 +1,5 @@
 import { ResultType } from "@/entity/enum/resultType";
+import { Word } from "@/entity/word";
 
 export const KEY_TEXT = [
   ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
@@ -7,13 +8,13 @@ export const KEY_TEXT = [
   ["Backspace", "Enter"]
 ];
 
-export type KeyObjType = { [key: string]: ResultType.Status };
+export type KeyObjType = { [key: string]: Word };
 
 export function getKeyObject() {
     const keyObj: KeyObjType = {};
     KEY_TEXT.forEach(row=>{
         row.forEach(item=>{
-            keyObj[item] = ResultType.Status.NONE;
+            keyObj[item] = new Word();
         });
     });
     return keyObj;

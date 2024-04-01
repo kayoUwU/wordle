@@ -2,7 +2,12 @@ import { Result } from "@/entity/result";
 
 const api = "https://wordle-apis.vercel.app/api/validate";
 
+export async function dummyValidateReq(word: string) {
+  return new Result({ isvalidword: true, score: [0,1,2,0,1,2] });
+};
+
 export async function validateReq(word: string) {
+  // return await dummyValidateReq(word);
   try {
     const res = await fetch(api, {
       method: "POST",
@@ -23,8 +28,4 @@ export async function validateReq(word: string) {
     console.warn("validateReq error", err);
     throw err;
   }
-};
-
-export async function dummyValidateReq(word: string) {
-  return new Result({ isvalidword: true, score: [0, 1, 2, 0, 1] });
 };

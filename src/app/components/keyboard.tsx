@@ -19,15 +19,15 @@ function Keyboard({
           <div key={index} className={styles.keyboard_row}>
             {row.map((item) => {
               return (
-                <div
+                <button
                   key={item}
                   onClick={() => {
                     onKeyDown(item);
                   }}
-                  style={ResultType.toStyle(keyStatus[item])}
+                  style={keyStatus[item].style}
                 >
                   {item}
-                </div>
+                </button>
               );
             })}
           </div>

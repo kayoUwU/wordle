@@ -47,3 +47,5 @@ After Serving, Open [http://localhost:3000](http://localhost:3000) with your bro
     - `WEB_BASE_PATH` with base path of this github page (i.e. `/wordle`).
 2. Run Github action `Deploy Next.js site to Pages`
 3. After deploy, Open the Gihub page (i.e. [https://kayouwu.github.io/wordle](https://kayouwu.github.io/wordle)) with your browser to see the result.
+
+![screenshot](screenshot.png)

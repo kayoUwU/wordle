@@ -10,6 +10,10 @@
   --grey-color: #a4aec4;
   --yellow-color: #f3c237;
   --green-color: #79b851;
+  --red-color:#b85151;
+
+  --max-column:5;
+  --max-row:6;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,7 +44,6 @@ main {
   display: flex;
   flex-flow: column wrap;
   justify-content: center;
-  align-content: center;
 }
 
 @media (prefers-color-scheme: dark) {

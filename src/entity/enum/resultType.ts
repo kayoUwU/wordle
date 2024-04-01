@@ -3,7 +3,8 @@ export namespace ResultType {
         WRONG,
         WRONG_POSITION,
         CORRET,
-        NONE
+        INVALID,
+        NONE,
     };
 
     export function fromOrdinal(i:number){
@@ -23,10 +24,19 @@ export namespace ResultType {
         [Status.WRONG]: {backgroundColor:'var(--grey-color)'},
         [Status.WRONG_POSITION]: {backgroundColor:'var(--yellow-color)'},
         [Status.CORRET]: {backgroundColor:'var(--green-color)'},
+        [Status.INVALID]: {backgroundColor:'var(--red-color)'},
         [Status.NONE]: {},
     };
     
     export function toStyle(status: keyof typeof ResultStyle) {
         return ResultStyle[status];
     }
+
+    const ResultAnimation: { [key in Status]: string  } = {
+        [Status.WRONG]: '',
+        [Status.WRONG_POSITION]: '',
+        [Status.CORRET]: '',
+        [Status.INVALID]: 'invalid',
+        [Status.NONE]: '',
+    };
 }

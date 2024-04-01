@@ -1,0 +1,106 @@
+@keyframes shakeHorizontal {
+    0% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+
+    30% {
+        transform: translateX(-30%);
+        opacity: 0.75;
+    }
+
+    60% {
+        transform: translateX(0%);
+        opacity: 0.5;
+    }
+
+    90% {
+        transform: translateX(30%);
+        opacity: 0.75;
+    }
+
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+}
+
+.shakeHorizontal {
+    animation-name: shakeHorizontal;
+    animation-duration: 200ms;
+    animation-fill-mode: both;
+    animation-iteration-count:3;
+}
+
+
+@keyframes bounceScale {
+    0% {
+        transform: scale(1);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.25);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.bounceScale {
+    animation-name: bounceScale;
+    animation-duration: 200ms;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fadeIn {
+    animation-name: fadeIn;
+    animation-duration: 1s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+}
+
+@keyframes rainbow {
+    0% {
+        opacity: 1;
+        background-color:magenta;
+    }
+    20% {
+        opacity: 1;
+        background-color: coral;
+    }
+    40% {
+        opacity: 1;
+        background-color: aquamarine;
+    }
+    60% {
+        opacity: 1;
+        background-color: aqua;
+    }
+    80% {
+        opacity: 1;
+        background-color:blueviolet;
+    }
+    100% {
+        opacity: 1;
+        background-color:magenta;
+    }
+}
+.rainbow {
+    animation-name: rainbow;
+    animation-duration: 3s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+}

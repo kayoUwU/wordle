@@ -1,5 +1,6 @@
 .keyboard {
     padding: 5px;
+    align-self: center;
     display: flex;
     flex-flow: column wrap;
     gap: 5px;
@@ -15,9 +16,10 @@
     gap: 5px;
 }
 
-.keyboard_row>div {
+.keyboard_row>button {
     flex: 1 1 auto;
-    min-width: 30px;
+    min-width: 50px;
+    min-height: 50px;
     padding: 3px;
     border: 2px solid #414458;
     border-radius: 5px;
@@ -26,13 +28,34 @@
     text-align: center;
 }
 
+.keyboard_row>button {
+    background-color: transparent;
+}
+.keyboard_row>button:hover {
+    background-color: darkorange;
+}
+.keyboard_row>button:active {
+    background-color: aqua;
+}
+
+.keyboard_row>button{
+    transition: background-color 300ms linear;
+  }
+
 @media (max-width: 640px) {
-    .keyboard_row>div {
+    .keyboard_row > button {
         font-size: 1em;
+        min-width: 30px;
+        min-height: 30px;
+    }
+
+    .keyboard_row {
+        flex:1 1 100%;
     }
 
     .keyboard {
-        padding: 5px, 1px;
-        width: 100%;
+        flex: 1;
+        padding: 10px 10px;
+        flex-flow: row wrap;
     }
 }
