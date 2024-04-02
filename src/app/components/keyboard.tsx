@@ -1,7 +1,6 @@
 import { memo, useMemo } from "react";
 import styles from "./keyboard.module.css";
 import { KeyObjType } from "@/lib/keyCode";
-import { ResultType } from "@/entity/enum/resultType";
 
 function Keyboard({
   onKeyDown,
@@ -24,7 +23,8 @@ function Keyboard({
                   onClick={() => {
                     onKeyDown(item);
                   }}
-                  style={keyStatus[item].style}
+                  className={keyStatus[item]?.className}
+                  style={keyStatus[item]?.style}
                 >
                   {item}
                 </button>

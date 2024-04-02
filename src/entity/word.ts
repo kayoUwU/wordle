@@ -7,13 +7,15 @@ export class Word {
     css?: React.CSSProperties | undefined;
     className: string;
 
-    constructor() {
+    constructor(index?:string|undefined) {
+        this.key=index;
         this.text='';
         this.result=ResultType.Status.NONE;
         this.className = '';
     }
 
     clone(item : Word) {
+        this.key = item.key;
         this.text = item.text;
         this.result = item.result;
     }

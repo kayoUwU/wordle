@@ -4,7 +4,7 @@
     display: flex;
     flex-flow: column wrap;
     gap: 5px;
-    background-color: chocolate;
+    background-color: var(--orange-color);
     border-radius: 10px;
     border: 2px solid #414458;
     box-shadow: 2px 2px 4px #414458;

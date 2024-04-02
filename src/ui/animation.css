@@ -28,7 +28,7 @@
 .shakeHorizontal {
     animation-name: shakeHorizontal;
     animation-duration: 200ms;
-    animation-fill-mode: both;
+    animation-fill-mode: forwards;
     animation-iteration-count:3;
 }
 
@@ -71,36 +71,75 @@
     animation-fill-mode: both;
 }
 
+@keyframes flexfadeIn {
+    from {
+        opacity: 0;
+        flex-grow: 0;
+        display: none;
+    }
+    to {
+        opacity: 1;
+        flex-grow: 1;
+        display: relative;
+        background-color:var(--blue-color);
+    }
+}
+
+.flexfadeIn {
+    animation-name: flexfadeIn;
+    animation-duration: 1s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+}
+
+@keyframes fadeFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0%);
+    }
+}
+
+.fadeFromTop {
+    animation-name: fadeFromTop;
+    animation-duration: 1s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+}
+
+
 @keyframes rainbow {
     0% {
-        opacity: 1;
         background-color:magenta;
-    }
-    20% {
         opacity: 1;
+    }
+    10% {
         background-color: coral;
     }
-    40% {
-        opacity: 1;
+    30% {
+        background-color:goldenrod;
+    }
+    50% {
         background-color: aquamarine;
     }
     60% {
-        opacity: 1;
         background-color: aqua;
     }
-    80% {
-        opacity: 1;
+    90% {
         background-color:blueviolet;
     }
     100% {
-        opacity: 1;
         background-color:magenta;
+        opacity: 1;
     }
 }
 .rainbow {
     animation-name: rainbow;
     animation-duration: 3s;
     animation-timing-function: ease-out;
-    animation-fill-mode: forwards;
+    animation-fill-mode: both;
     animation-iteration-count: infinite;
 }

@@ -39,6 +39,8 @@
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
+
+  opacity: 0.9;
 }
 
 .word.active {
@@ -53,6 +55,25 @@
   transition: background-color 300ms linear, border-color 300ms linear;
 }
 
+.wordle_area_win {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-Index:-1;
+}
+
+.wordle_area_win > div {
+  height: 100%;
+  width: 100%;
+  animation-play-state: running;
+}
+
+.wordle_area:hover > .wordle_area_win > div{
+  animation-play-state: paused;
+}
+
 .result {
   align-self: center;
 
@@ -65,7 +86,6 @@
   color: black;
   opacity: 0;
 }
-
 
 .author {
   text-decoration: none;
