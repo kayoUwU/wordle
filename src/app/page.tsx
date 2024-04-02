@@ -321,14 +321,14 @@ function Home() {
       animationDelay: `${currentTransitionDelay}ms`,
     };
     if(isWaiting){
-      text = "Loading";
+      text = "Loading...";
       className = className.concat(" ", "fadeIn");
     }
     else if (gameStatus === GameStatus.INVALID) {
       text = "Invalid Word!";
       className = className.concat(" ", "fadeIn");
     } else if (gameStatus === GameStatus.WIN) {
-      text = "Greate! You Guess The Word!";
+      text = "Great! You Guess The Word!";
       className = className.concat(" ", "fadeFromTop");
     } else if (gameStatus === GameStatus.LOSS) {
       text = "You may try again by pressing F5.";
@@ -346,7 +346,7 @@ function Home() {
     <main>
       <div className={styles.title}>
         <div>
-          <Image src={LOGO} alt="W" height={80} width={80} className={isWaiting?'rotate ':undefined} />
+          <Image src={LOGO} alt="W" height={80} width={80} className={isWaiting?'rotate ':undefined} priority />
           ordle
         </div>
       </div>
