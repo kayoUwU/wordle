@@ -26,6 +26,8 @@ const getWordleArr = () =>
     .fill(new Word())
     .map((_, index) => new Word(index.toString()));
 
+const ANIMATION_MS = 300;
+
 function Home() {
   const [wordle, setWordle] = useState<Word[]>(() => getWordleArr());
   const [currentGuessRow, setCurrentGuessRow] = useState<number>(0);
@@ -107,7 +109,7 @@ function Home() {
               item.result = result.score[j];
               item.css = { transitionDelay: `${animationDelay}ms` };
               //keep item.key prevent rerender change original color (i.e. not trigger color transition)
-              animationDelay += 200;
+              animationDelay += ANIMATION_MS;
 
               // key use the highest score style
               if (
@@ -318,7 +320,11 @@ function Home() {
     let style: CSSProperties = {
       animationDelay: `${currentTransitionDelay}ms`,
     };
-    if (gameStatus === GameStatus.INVALID) {
+    if(isWaiting){
+      text = "Loading";
+      className = className.concat(" ", "fadeIn");
+    }
+    else if (gameStatus === GameStatus.INVALID) {
       text = "Invalid Word!";
       className = className.concat(" ", "fadeIn");
     } else if (gameStatus === GameStatus.WIN) {
@@ -334,13 +340,13 @@ function Home() {
         {text}
       </div>
     );
-  }, [currentTransitionDelay, gameStatus]);
+  }, [currentTransitionDelay, gameStatus, isWaiting]);
 
   return (
     <main>
       <div className={styles.title}>
         <div>
-          <Image src={LOGO} alt="W" height={80} width={80} />
+          <Image src={LOGO} alt="W" height={80} width={80} className={isWaiting?'rotate ':undefined} />
           ordle
         </div>
       </div>
