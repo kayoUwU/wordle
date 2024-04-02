@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/ui/globals.css";
 import "@/ui/animation.css";
+import {WEB_ICON} from "@/lib/constant";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
   description: "Guess Word Game",
   keywords: ["wordle"],
   icons: {
-    icon: "/favicon.ico",
+    icon: WEB_ICON,
   },
 };
 
