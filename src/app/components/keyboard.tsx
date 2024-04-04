@@ -1,19 +1,17 @@
 import { memo, useMemo } from "react";
 import styles from "./keyboard.module.css";
-import { KeyObjType } from "@/lib/keyCode";
+import { Keybroad, DEFAULT_KEY } from "@/entity/keyCode";
 
 function Keyboard({
   onKeyDown,
-  keyStatus,
-  keyArr
+  keybroadData,
 }: {
   onKeyDown: (key: string) => void;
-  keyStatus: KeyObjType;
-  keyArr : string[][]
+  keybroadData:Keybroad.DataType
 }) {
   const keyboard = useMemo(
     () =>
-    keyArr.map((row, index) => {
+    DEFAULT_KEY.map((row, index) => {
         return (
           <div key={index} className={styles.keyboard_row}>
             {row.map((item) => {
@@ -23,8 +21,9 @@ function Keyboard({
                   onClick={() => {
                     onKeyDown(item);
                   }}
-                  className={keyStatus[item]?.className}
-                  style={keyStatus[item]?.style}
+                  className={keybroadData[item]?.className}
+                  style={keybroadData[item]?.style}
+                  hidden={keybroadData[item]?.hidden}
                 >
                   {item}
                 </button>
@@ -33,7 +32,7 @@ function Keyboard({
           </div>
         );
       }),
-    [keyArr, keyStatus, onKeyDown]
+    [keybroadData, onKeyDown]
   );
   return <div className={styles.keyboard}>{keyboard}</div>;
 }

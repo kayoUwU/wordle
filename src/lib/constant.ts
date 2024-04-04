@@ -1,3 +1,7 @@
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
 export const LOGO = BASE_PATH.concat("/icon-720.webp");
 export const WEB_ICON = BASE_PATH.concat("/favicon.ico");
+
+export const ANIMATION_MS = 300;
+
+export const DEV_MODE_SEARCH = "?DEV=KAYOUWU";
