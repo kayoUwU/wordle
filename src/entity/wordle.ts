@@ -1,40 +1,28 @@
+import { MODE, ModeType, Mode } from "./enum/modeType";
 import { Word } from "./word";
-
-const WORDLE_LEN = 5;
-const WORDLE_MAX_GUESS_NO = 6;
-const WORLDE_ARRAY_SIZE = WORDLE_LEN * WORDLE_MAX_GUESS_NO;
 
 export class WordleItem extends Word {
   isActiveRow: boolean;
-  private _isActiveWord: boolean;
+  isActiveWord: boolean;
 
   constructor(index?: string | undefined){
     super(index);
     this.isActiveRow = false;
-    this._isActiveWord = false;
+    this.isActiveWord = false;
   }
 
   
   cloneResult(item:WordleItem) {
     super.cloneResult(item);
     this.isActiveRow = item.isActiveRow;
-    this._isActiveWord = item._isActiveWord;
+    this.isActiveWord = item.isActiveWord;
 
     return this;
   }
 
   toInAcitve() {
     this.isActiveRow = false;
-    this._isActiveWord = false;
-  }
-
-  get isActiveWord(): boolean {
-    return this._isActiveWord;
-  }
-
-  set isActiveWord(isActive : boolean) {
-    this.isActiveRow = isActive;
-    this._isActiveWord = isActive;
+    this.isActiveWord = false;
   }
 }
 
@@ -42,10 +30,12 @@ export namespace Wordle {
   export type WordleObjType = {
     wordleArr: WordleItem[];
     currentPosition: number;
+    modeType:ModeType;
   };
 
-  export function buildWordleArr() {
-    return Array(WORLDE_ARRAY_SIZE)
+  export function buildWordleArr(modeType:ModeType = ModeType.DEFAULT) {
+    const mode = MODE[modeType];
+    return Array(mode.size)
       .fill(new WordleItem())
       .map((_, index) => {
         const item = new WordleItem(index.toString());
@@ -53,7 +43,7 @@ export namespace Wordle {
           item.isActiveWord = true;
         }
 
-        if(index>=getStartIndex(0) && index<getEndIndex(0)){
+        if(index>=_getStartIndex(0,mode) && index<_getEndIndex(0,mode)){
           item.isActiveRow = true;
         }
 
@@ -65,40 +55,51 @@ export namespace Wordle {
     return {
       wordleArr: buildWordleArr(),
       currentPosition: 0,
+      modeType:ModeType.DEFAULT
     };
   }
 
-  export function getCurrentGuessRow(currentPosition: number): number {
-    return Math.trunc(currentPosition / WORDLE_LEN);
+  function _getCurrentGuessRow(currentPosition: number, mode:Mode): number {
+    return Math.trunc(currentPosition / mode.maxCol);
+  }
+  export function getCurrentGuessRow(currentPosition: number, modeType:ModeType): number {
+    return _getCurrentGuessRow(currentPosition , MODE[modeType]);
   }
 
   // current Start Position (includsive)
-  export function getStartIndex(currentPosition: number): number {
-    return WORDLE_LEN * getCurrentGuessRow(currentPosition);
+  function _getStartIndex(currentPosition: number, mode:Mode): number {
+    return mode.maxCol * _getCurrentGuessRow(currentPosition,mode);
+  }
+  export function getStartIndex(currentPosition: number, modeType:ModeType): number {
+    return _getStartIndex(currentPosition,MODE[modeType]);
   }
 
   // current End Position (excludsive)
-  export function getEndIndex(currentPosition: number): number {
-    return WORDLE_LEN * getCurrentGuessRow(currentPosition) + WORDLE_LEN;
+  function _getEndIndex(currentPosition: number, mode:Mode): number {
+    return mode.maxCol * _getCurrentGuessRow(currentPosition,mode) + mode.maxCol;
+  }
+  export function getEndIndex(currentPosition: number, modeType:ModeType): number {
+    return _getEndIndex(currentPosition,MODE[modeType]);
   }
 
   export function getCurrentWord(wordle: WordleObjType): string {
+    const mode = MODE[wordle.modeType];
     return wordle.wordleArr
       .slice(
-        getStartIndex(wordle.currentPosition),
-        getEndIndex(wordle.currentPosition)
+        _getStartIndex(wordle.currentPosition,mode),
+        _getEndIndex(wordle.currentPosition,mode)
       )
       .map((item) => item.text)
       .join('');
   }
 
-  export function isHasNextAttempt(currentPosition: number): boolean {
-    return currentPosition < WORLDE_ARRAY_SIZE - 1; // currentGuessRow < WORDLE_MAX_GUESS_NO - 1
+  export function isHasNextAttempt(currentPosition: number, modeType:ModeType): boolean {
+    return currentPosition < MODE[modeType].size - 1; // currentGuessRow < WORDLE_MAX_GUESS_NO - 1
   }
 
   export function isStartOfNewRow(wordle: WordleObjType): boolean {
     return (
-      wordle.currentPosition === getStartIndex(wordle.currentPosition) &&
+      wordle.currentPosition === _getStartIndex(wordle.currentPosition, MODE[wordle.modeType]) &&
       wordle.wordleArr[wordle.currentPosition].text === ""
     );
   }

@@ -4,7 +4,8 @@ import { Wordle, WordleItem } from "@/entity/wordle";
 import { useCallback, useState } from "react";
 import { validateReq } from "./query";
 import { ResultType } from "@/entity/enum/resultType";
-import { ANIMATION_MS, DEV_MODE_SEARCH } from "./constant";
+import { ANIMATION_MS, CSS_MAX_COL_PROP_NAME, CSS_MAX_ROW_PROP_NAME, CSS_ROOT_NAME, DEV_MODE_SEARCH } from "./constant";
+import { MODE, ModeType } from "@/entity/enum/modeType";
 
 // Change Style
 function getUpdatedKeyObj(
@@ -74,6 +75,8 @@ export function useGameManager() {
 
   const [isWaiting, setIsWaiting] = useState<boolean>(false);
 
+  const [modeType, setModeType] = useState<ModeType>(ModeType.DEFAULT);
+
   const updateGameStatus = useCallback(
     (newGameStatus: GameStatus.Status, transitionDelay: number = 0) => {
       if (gameStatus !== newGameStatus) {
@@ -92,8 +95,8 @@ export function useGameManager() {
     [gameStatus]
   );
 
-  const resetGame = useCallback(() => {
-    setWordleArr(Wordle.buildWordleArr());
+  const resetGame = useCallback((modeType:ModeType) => {
+    setWordleArr(Wordle.buildWordleArr(modeType));
     setCurrentPosition(0);
     setCurrentTransitionDelay(0);
     setKeybroadData(Keybroad.buildKeyObject());
@@ -101,12 +104,33 @@ export function useGameManager() {
     setIsWaiting(false);
   }, [updateGameStatus]);
 
+  const changeMode = useCallback(()=>{
+    if(document){
+      let newModeType = modeType;
+      if(modeType==ModeType.DEFAULT){
+        newModeType = ModeType.HARD;
+      } else {
+        newModeType = ModeType.DEFAULT;
+      }
+
+      setModeType(newModeType);
+      resetGame(newModeType);
+
+      const root = document.querySelector(CSS_ROOT_NAME) as HTMLElement;
+      if(root){
+        const mode = MODE[newModeType];
+        root.style.setProperty(CSS_MAX_COL_PROP_NAME,mode.maxCol.toString());
+        root.style.setProperty(CSS_MAX_ROW_PROP_NAME,mode.maxRow.toString());
+      }
+    }
+  },[modeType, resetGame]);
+
   const onSubmit = useCallback(() => {
     if (gameStatus === GameStatus.Status.TOBE_SUBMIT) {
       setIsWaiting(true);
       // valid word
       validateReq(
-        Wordle.getCurrentWord({ wordleArr, currentPosition }),
+        Wordle.getCurrentWord({ wordleArr, currentPosition, modeType }),
         window?.location?.search !== DEV_MODE_SEARCH ? false : true
       )
         .then((result) => {
@@ -119,8 +143,8 @@ export function useGameManager() {
           const keyClone = { ...keybroadData };
           const timestamp = Date.now();
           for (
-            let i = Wordle.getStartIndex(currentPosition), j = 0;
-            i < Wordle.getEndIndex(currentPosition);
+            let i = Wordle.getStartIndex(currentPosition,modeType), j = 0;
+            i < Wordle.getEndIndex(currentPosition,modeType);
             i++, j++
           ) {
             if (result.isvalidword && j >= result.score.length) {
@@ -156,9 +180,9 @@ export function useGameManager() {
               }
 
               animationDelay += ANIMATION_MS;
+              item.toInAcitve();
             }
-
-            item.toInAcitve();
+            
             wordleClone[i] = item;
             if (item.result !== ResultType.Status.CORRET) {
               win = false;
@@ -172,7 +196,7 @@ export function useGameManager() {
             if (
               win ||
               //no more guess
-              !Wordle.isHasNextAttempt(currentPosition)
+              !Wordle.isHasNextAttempt(currentPosition, modeType)
             ) {
               //result
               const final = win
@@ -186,8 +210,8 @@ export function useGameManager() {
               // update next row style
               const nextPosition = currentPosition + 1;
               for (
-                let i = Wordle.getStartIndex(nextPosition);
-                i < Wordle.getEndIndex(nextPosition);
+                let i = Wordle.getStartIndex(nextPosition, modeType);
+                i < Wordle.getEndIndex(nextPosition, modeType);
                 i++
               ) {
                 const item: WordleItem = new WordleItem().cloneResult(
@@ -214,7 +238,7 @@ export function useGameManager() {
           setIsWaiting(false);
         });
     }
-  }, [currentPosition, gameStatus, keybroadData, updateGameStatus, wordleArr]);
+  }, [currentPosition, gameStatus, keybroadData, modeType, updateGameStatus, wordleArr]);
 
   // false = need prevent event
   const onKeyDown = useCallback(
@@ -227,7 +251,7 @@ export function useGameManager() {
         gameStatus === GameStatus.Status.IN_PROGRESS &&
         /^[a-zA-Z]$/.test(key)
       ) {
-        if (Wordle.isStartOfNewRow({ wordleArr, currentPosition })) {
+        if (Wordle.isStartOfNewRow({ wordleArr, currentPosition, modeType })) {
           setCurrentTransitionDelay(0); // reset delay
         }
 
@@ -242,7 +266,7 @@ export function useGameManager() {
         wordleArr[currentPosition] = item;
 
         const nextPosition = currentPosition + 1;
-        if (nextPosition === Wordle.getEndIndex(currentPosition)) {
+        if (nextPosition === Wordle.getEndIndex(currentPosition, modeType)) {
           updateGameStatus(GameStatus.Status.TOBE_SUBMIT);
         } else {
           // update next word style
@@ -258,7 +282,7 @@ export function useGameManager() {
       } else if (
         !GameStatus.isDone(gameStatus) &&
         key === "Backspace" &&
-        currentPosition !== Wordle.getStartIndex(currentPosition)
+        currentPosition !== Wordle.getStartIndex(currentPosition, modeType)
       ) {
         let prevPosition = currentPosition - 1;
 
@@ -299,20 +323,12 @@ export function useGameManager() {
         onSubmit();
         return true;
       } else if (key === "F5" && gameStatus === GameStatus.Status.LOSS) {
-        resetGame();
+        resetGame(modeType);
         return true;
       }
       return false;
     },
-    [
-      currentPosition,
-      gameStatus,
-      isWaiting,
-      onSubmit,
-      resetGame,
-      updateGameStatus,
-      wordleArr,
-    ]
+    [currentPosition, gameStatus, isWaiting, modeType, onSubmit, resetGame, updateGameStatus, wordleArr]
   );
 
   return {
@@ -322,5 +338,7 @@ export function useGameManager() {
     isWaiting,
     gameStatus,
     onKeyDown,
+    changeMode,
+    modeType,
   };
 }

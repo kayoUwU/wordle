@@ -8,6 +8,7 @@ import { GameStatus } from "@/entity/enum/gameStatus";
 import { LOGO } from "@/lib/constant";
 import { useGameManager } from "@/lib/useGameManager";
 import WordleBoard from "./components/wordleBoard";
+import { MODE } from "@/entity/enum/modeType";
 
 function Home() {
   const {
@@ -17,6 +18,8 @@ function Home() {
     isWaiting,
     gameStatus,
     onKeyDown,
+    changeMode,
+    modeType,
   } = useGameManager();
 
   const handleKeyDownEvent = useCallback(
@@ -73,6 +76,7 @@ function Home() {
           />
           ordle
         </div>
+        <button onClick={changeMode} className={styles.mode}>{MODE[modeType].name}</button>
       </div>
       {renderResult}
       <WordleBoard
