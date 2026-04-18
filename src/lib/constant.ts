@@ -5,6 +5,8 @@ export const WEB_ICON = BASE_PATH.concat("/favicon.ico");
 export const ANIMATION_MS = 300;
 
 export const DEV_MODE_SEARCH = "?DEV=KAYOUWU";
+export const NYC_MODE_SEARCH = "?MODE=NYC"; //no offical doc;
+export const DEMO_WORD_LIST = ["hello", "world", "color", "stone", "train"];
 
 export const CSS_ROOT_NAME = ":root";
 export const CSS_MAX_COL_PROP_NAME = "--max-column";

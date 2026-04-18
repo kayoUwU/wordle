@@ -2,10 +2,10 @@ import { GameStatus } from "@/entity/enum/gameStatus";
 import { Keybroad, KeyCode } from "@/entity/keyCode";
 import { Wordle, WordleItem } from "@/entity/wordle";
 import { useCallback, useState } from "react";
-import { validateReq } from "./query";
 import { ResultType } from "@/entity/enum/resultType";
 import { ANIMATION_MS, CSS_MAX_COL_PROP_NAME, CSS_MAX_ROW_PROP_NAME, CSS_ROOT_NAME, DEV_MODE_SEARCH } from "./constant";
 import { MODE, ModeType } from "@/entity/enum/modeType";
+import { useWordAnswer } from "./useWordAnswer";
 
 // Change Style
 function getUpdatedKeyObj(
@@ -73,9 +73,10 @@ export function useGameManager() {
     GameStatus.Status.IN_PROGRESS
   );
 
-  const [isWaiting, setIsWaiting] = useState<boolean>(false);
+  const [isWaiting, setIsWaiting] = useState<boolean>();
 
   const [modeType, setModeType] = useState<ModeType>(ModeType.DEFAULT);
+  const {isLoading : isAnswerLoading, validateAnswer} = useWordAnswer(MODE[modeType].maxCol); //TODO loading
 
   const updateGameStatus = useCallback(
     (newGameStatus: GameStatus.Status, transitionDelay: number = 0) => {
@@ -129,7 +130,7 @@ export function useGameManager() {
     if (gameStatus === GameStatus.Status.TOBE_SUBMIT) {
       setIsWaiting(true);
       // valid word
-      validateReq(
+      validateAnswer(
         Wordle.getCurrentWord({ wordleArr, currentPosition, modeType }),
         window?.location?.search !== DEV_MODE_SEARCH ? false : true
       )
@@ -238,7 +239,7 @@ export function useGameManager() {
           setIsWaiting(false);
         });
     }
-  }, [currentPosition, gameStatus, keybroadData, modeType, updateGameStatus, wordleArr]);
+  }, [currentPosition, gameStatus, keybroadData, modeType, updateGameStatus, validateAnswer, wordleArr]);
 
   // false = need prevent event
   const onKeyDown = useCallback(

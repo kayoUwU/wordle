@@ -1,37 +1,45 @@
-import { Result } from "@/entity/result";
+import { REQUEST_URL , REQ_TYPES , RES_TYPES} from "@/lib/apiUrl"; 
 
-const api = "https://wordle-apis.vercel.app/api/validate";
+// true if word exist
+export async function dictionaryCheckReq(word: string) : Promise<boolean> {
+  const url = `${REQUEST_URL.dictionaryApi}/${word.toLowerCase()}`;
 
-export async function dummyValidateReq(word: string) {
-  console.log('DEV:',word);
-  return new Result({
-    isvalidword: word.toUpperCase() === "VALID" ? false : true,
-    score: word.toUpperCase() === "SCORE" ? [2, 2, 2, 2, 2] : [0, 1, 2, 0, 1, 2],
-  });
-}
-
-export async function validateReq(word: string, isDev:boolean=false) {
-  if(isDev){
-    return dummyValidateReq(word);
-  }
   try {
-    const res = await fetch(api, {
-      method: "POST",
+    const res = await fetch(url, {
+      method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        guess: word,
-      }),
     });
-    const json = await res.json();
-    return new Result({
-      isvalidword: json?.is_valid_word || false,
-      score: json?.score || [],
-    });
+
+    const json = await res.json() as RES_TYPES.DictionaryResType;
+    if(json?.entries && json?.entries.length > 0) {
+      return true;
+    }
+    return false;
   } catch (err) {
-    console.warn("validateReq error", err);
+    console.warn("wordCheckReq error", err);
     throw err;
   }
 }
+
+
+export async function getDailyWord(date: Date) : Promise<string> {
+  const req : REQ_TYPES.GetNYCDailyWordReq = {date};
+
+  const res = await fetch(REQUEST_URL.nycWordleApi, {
+    method: "POST",
+    headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+    },
+    body: JSON.stringify(req)
+  });
+
+  const json = await res.json() as RES_TYPES.NycWordResType;
+  console.log("res ", json);
+
+  return json.solution;
+}
+
