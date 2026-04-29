@@ -4,14 +4,16 @@ import { getDailyWord } from "./query";
 import { ResultType } from "@/entity/enum/resultType";
 import { Result } from "@/entity/result";
 import { dictionaryCheckReq } from "./query";
+import { WordleSourceFields } from "@/entity/WordleSourceFields";
+import { WORDLE_LEN } from "@/lib/constant";
 
-export async function dummyValidateReq(input: string, wordLength: number) {
+export async function dummyValidateReq(input: string) {
   console.log("DEV:", input);
   return new Result({
     isvalidword: input.toUpperCase() === "VALID" ? false : true,
     score:
       input.toUpperCase() === "SCORE"
-        ? Array(wordLength).fill(ResultType.Status.CORRET)
+        ? Array(WORDLE_LEN).fill(ResultType.Status.CORRET)
         : [
             ResultType.Status.WRONG,
             ResultType.Status.WRONG_POSITION,
@@ -22,36 +24,38 @@ export async function dummyValidateReq(input: string, wordLength: number) {
   });
 }
 
-export function useWordAnswer(wordLength: number) {
+export function useWordAnswer(prop:WordleSourceFields) {
   const [wordSolutionChars, setWordolutionChars] = useState<string[] | null>(
     null,
-  ); //TODO　:by date
+  ); 
   const [isLoading, setIsLoading] = useState(true);
 
+  // load answer
   useEffect(() => {
+    setIsLoading(true);
     (async () => {
-      const now = new Date();
-      console.log("now",now);
-      const res = await getDailyWord(now);
+      console.log("req prop.wordleDate %s, prop.wordleSourceType %s",prop.wordleDate, prop.wordleSourceType);
+      const res = await getDailyWord(new WordleSourceFields(prop.wordleSourceType, prop.wordleDate));
       console.log("Solution %s", res);
-      if(res){
+      if(res !== undefined){
         setWordolutionChars(res.toUpperCase().split(""));
+      } else {
+        setWordolutionChars(null);
       }
       setIsLoading(false);
     })();
-  },[]);
+  },[prop.wordleDate, prop.wordleSourceType]);
 
   const validateAnswer = async (input: string, isDev: boolean = false) => {
     if (isDev) {
-      return dummyValidateReq(input, wordLength);
+      return dummyValidateReq(input);
     }
 
     if(!wordSolutionChars){
-      //TODO show no solution
       throw new Error("no solution");
     }
 
-    const score = Array(wordLength).fill(ResultType.Status.WRONG);
+    const score = Array(wordSolutionChars.length).fill(ResultType.Status.WRONG);
     try {
       //assume wordSolutionChars.length = input.length = wordLength
       const isValid = await dictionaryCheckReq(input);
@@ -67,7 +71,6 @@ export function useWordAnswer(wordLength: number) {
 
       //compare char by char
       inputChars.forEach((char, i) => {
-        console.log(char," char i ",compareChars[i])
         if (char === compareChars[i]) {
           score[i] = ResultType.Status.CORRET;
           compareChars[i] = ""; //each char use once
@@ -90,12 +93,13 @@ export function useWordAnswer(wordLength: number) {
         score,
       });
     } catch (err) {
-      console.warn("validateReq error", err);
+      console.error("validateReq error", err);
       throw err;
     }
   };
 
   return {
+    wordSolutionChars,
     isLoading,
     validateAnswer,
   };

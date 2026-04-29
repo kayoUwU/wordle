@@ -1,3 +1,5 @@
+import { WORDLE_LEN } from "@/lib/constant";
+
 export class Mode {
     name: string;
     maxCol: number;
@@ -17,7 +19,6 @@ export enum ModeType {
     HARD
 }
 
-const WORDLE_LEN = 5;
 export const MODE : {[key in ModeType]:Mode} = {
     [ModeType.DEFAULT] : new Mode({
         name:'Normal',

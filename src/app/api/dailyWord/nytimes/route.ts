@@ -1,10 +1,16 @@
+import { PARTY3RD_REQUEST_URL } from "@/lib/apiUrl";
+import { REQ_TYPES, RES_TYPES } from "@/entity/api/wordleAnswer";
+import { NextRequest, NextResponse } from "next/server";
+import { GetNYTimesDailyWordSearchParams } from "@/entity/api/wordleAnswer/apiReq";
+import { blockDirectBrowserAccess } from "@/lib/apiUtils";
+import { validateDateStringFormat } from "@/lib/utils";
 
-import { PARTY3RD_REQUEST_URL, REQ_TYPES , RES_TYPES} from "@/lib/apiUrl"
-
-const getNYCDailyWord = async (req: REQ_TYPES.GetNYCDailyWordReq) : Promise<RES_TYPES.NycWordResType> => {
-  console.log("getNYCDailyWord date",req.date);
-  const date = req.date;
-  const url = `${PARTY3RD_REQUEST_URL.nycWordleApi}/${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2,'0')}.json`;
+// undefined = no found
+const getNYCDailyWord = async (
+  req: REQ_TYPES.GetNYTimesDailyWordReq,
+): Promise<RES_TYPES.NyTimesWordRes | undefined> => {
+  console.log("getNYCDailyWord req date: ", req.dateStr);
+  const url = `${PARTY3RD_REQUEST_URL.nytimesWordleApi}/${req.dateStr}.json`;
 
   try {
     const res = await fetch(url, {
@@ -15,29 +21,46 @@ const getNYCDailyWord = async (req: REQ_TYPES.GetNYCDailyWordReq) : Promise<RES_
       },
     });
 
-    const json = await res.json() as RES_TYPES.NycWordResType;
-    console.log(`NYCDailyWord ${json.solution}`);
-    return json;
+    const json = await res.json();
+    console.log(`getNYCDailyWord res solution: ${json.solution}, `, json);
+    if (json.status && json.status === "ERROR") {
+      return undefined;
+    }
+    return json as RES_TYPES.NyTimesWordRes;
   } catch (err) {
-    console.warn("wordCheckReq error", err);
+    console.error("getNYCDailyWord error", err);
     throw err;
   }
 };
 
-//TODO cahce?
-export async function POST(req: Request) {
+//TODO cahce? https://nextjs.org/docs/app/getting-started/caching#working-with-runtime-apis
+export async function GET(req: NextRequest) {
   try {
-     // Parse the request body
-    const proxyReqBody = await req.json();
-    const res = await getNYCDailyWord({date:new Date(proxyReqBody.date)}); //String to Date
+    blockDirectBrowserAccess(req);
 
-    return new Response(JSON.stringify(res), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    // Parse the request 
+    const { searchParams } = req.nextUrl;
+
+    const dateStr = searchParams.get(GetNYTimesDailyWordSearchParams.dateStr);
+    if(dateStr === undefined || dateStr === null){
+      return NextResponse.json({ error: 'missing params: dateStr' }, {status: 200})
+    }
+
+    // Validate date format (YYYY-MM-DD)
+    if (!validateDateStringFormat(dateStr)) {
+      return NextResponse.json({ error: 'Invalid dateStr format' }, { status: 400 });
+    }
+
+    // Proxy the request to the real external API
+    const res = await getNYCDailyWord({ dateStr });
+
+    if (res === undefined) {
+      return NextResponse.json({ error: 'no solution found' }, {status: 200})
+    }
+
+    //headers: { "Content-Type": "application/json" }
+    return NextResponse.json(res,{status: 200});
   } catch (error) {
-    return new Response(JSON.stringify({ error: `proxy error ${error}` }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json({ error: `proxy error ${error}` }, {status: 500})
   }
 }

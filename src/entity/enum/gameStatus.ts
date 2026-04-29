@@ -1,8 +1,9 @@
 export namespace GameStatus {
   export const enum Status {
+    NO_SOLUTION,
     IN_PROGRESS,
     TOBE_SUBMIT,
-    INVALID,
+    INVALID, //not in dictionary
     WIN,
     LOSS,
   }
@@ -15,6 +16,8 @@ export namespace GameStatus {
     gameStatus: Status
   ): GameStatusRenderProp {
     switch (gameStatus) {
+      case Status.NO_SOLUTION:
+        return { text: "No Solution For the date!" , className: "fadeIn" };
       case Status.INVALID:
         return { text: "Invalid Word!", className: "fadeIn" };
       case Status.WIN:

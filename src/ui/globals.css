@@ -50,6 +50,16 @@ main {
   padding: 2% 0;
 }
 
+button, button:hover, button:active, button:visited {
+  background-color: var(--orange-color);
+  top: 0;
+  right: 0;
+  border: 0;
+  border-radius: 2px;
+  padding: 2px;
+  cursor: pointer;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

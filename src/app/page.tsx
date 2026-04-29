@@ -1,6 +1,14 @@
 "use client";
 
-import { CSSProperties, memo, useCallback, useEffect, useMemo } from "react";
+import {
+  ChangeEvent,
+  CSSProperties,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Image from "next/image";
 import styles from "./page.module.css";
 import Keyboard from "./components/keyboard";
@@ -9,6 +17,8 @@ import { LOGO } from "@/lib/constant";
 import { useGameManager } from "@/lib/useGameManager";
 import WordleBoard from "./components/wordleBoard";
 import { MODE } from "@/entity/enum/modeType";
+import { WordleSourceFields } from "@/entity/WordleSourceFields";
+import { WordleSourceType, WORDLE_SOURCE } from "@/entity/enum/wordleSource";
 
 function Home() {
   const {
@@ -16,11 +26,31 @@ function Home() {
     keybroadData,
     currentTransitionDelay,
     isWaiting,
+    isAnswerLoading,
     gameStatus,
     onKeyDown,
-    changeMode,
+    onChangeMode,
     modeType,
+    initializeWordleSourceInput,
+    onSubmitWordleSourceInput,
   } = useGameManager();
+
+  const [wordleSourceFields, setWordleSourceFields] =
+    useState<WordleSourceFields>(() => initializeWordleSourceInput());
+
+  const wordleSourceMenu = useMemo(
+    () =>
+      Object.keys(WordleSourceType)
+        .filter((key) => !isNaN(Number(key)) && key.trim() !== "")
+        .map((value) => (
+          <option key={value} value={value}>
+            {WORDLE_SOURCE[Number(value) as WordleSourceType].displayName}
+          </option>
+        )),
+    [],
+  );
+
+  const [isFocusWordleDateInput,setFocusWordleDateInput] = useState<boolean>(false);
 
   const handleKeyDownEvent = useCallback(
     (e: KeyboardEvent) => {
@@ -29,15 +59,52 @@ function Home() {
         e.preventDefault();
       }
     },
-    [onKeyDown]
+    [onKeyDown],
   );
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDownEvent);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDownEvent);
-    };
-  }, [handleKeyDownEvent]);
+    if(!isFocusWordleDateInput){
+      window.addEventListener("keydown", handleKeyDownEvent);
+
+      // call before the effect re-runs, such as isFocusWordleDateInput = false
+      return () => {
+        window.removeEventListener("keydown", handleKeyDownEvent);
+      };
+    }
+  }, [handleKeyDownEvent, isFocusWordleDateInput]);
+
+  //change focus for date input
+  const onFocusWordleDateInput = useCallback(() => {
+    if(!isFocusWordleDateInput){
+      setFocusWordleDateInput(true);
+    }
+  },[isFocusWordleDateInput]);
+
+  const onBlurWordleDateInput = useCallback(()=>{
+    if(isFocusWordleDateInput){
+      setFocusWordleDateInput(false);
+    }
+  },[isFocusWordleDateInput]);
+
+  const onChangeWordleSource = useCallback(
+    (e: ChangeEvent<HTMLSelectElement>) => {
+      const choice: string = e.target.value;
+      if (Object.keys(WordleSourceType).includes(choice)) {
+        const newWordleSource: WordleSourceType = Number(choice);
+
+        if (newWordleSource === wordleSourceFields.wordleSourceType) {
+          return;
+        }
+
+        setWordleSourceFields(
+          wordleSourceFields.copy({ wordleSourceType: newWordleSource }),
+        );
+      } else {
+        console.error("onChangeWordleSource: Invalid WordleSourceType:", choice);
+      }
+    },
+    [wordleSourceFields],
+  );
 
   const renderResult = useMemo(() => {
     let text: string | JSX.Element = ".";
@@ -45,14 +112,14 @@ function Home() {
     let style: CSSProperties = {
       animationDelay: `${currentTransitionDelay}ms`,
     };
-    if (isWaiting) {
+    if (isWaiting || isAnswerLoading) {
       text = "Loading...";
       className = className.concat(" ", "fadeIn");
     } else {
       const gameStatusRenderProp =
         GameStatus.getGameStatusRenderProp(gameStatus);
-      text = gameStatusRenderProp.text || '.';
-      className = className.concat(" ", gameStatusRenderProp.className|| '');
+      text = gameStatusRenderProp.text || ".";
+      className = className.concat(" ", gameStatusRenderProp.className || "");
     }
 
     return (
@@ -60,7 +127,7 @@ function Home() {
         {text}
       </div>
     );
-  }, [currentTransitionDelay, gameStatus, isWaiting]);
+  }, [currentTransitionDelay, gameStatus, isAnswerLoading, isWaiting]);
 
   return (
     <main>
@@ -71,13 +138,44 @@ function Home() {
             alt="W"
             height={80}
             width={80}
-            className={isWaiting ? "rotate " : undefined}
+            className={isWaiting || isAnswerLoading ? "rotate " : undefined}
             priority
           />
           ordle
         </div>
-        <button onClick={changeMode} className={styles.mode}>{MODE[modeType].name}</button>
+        <button onClick={onChangeMode} className={styles.mode}>
+          {MODE[modeType].name}
+        </button>
       </div>
+
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <input
+          type="date"
+          value={WORDLE_SOURCE[wordleSourceFields.wordleSourceType].isDisableDate?"":wordleSourceFields.wordleDate}
+          placeholder="YYYY-MM-DD" 
+          disabled={WORDLE_SOURCE[wordleSourceFields.wordleSourceType].isDisableDate}
+          onChange={(e) => {
+            if (wordleSourceFields.wordleDate !== e.target.value)
+              setWordleSourceFields(
+                wordleSourceFields.copy({ wordleDate: e.target.value }),
+              );
+          }}
+          onFocus={()=>onFocusWordleDateInput()}
+          onBlur={()=>onBlurWordleDateInput()}
+        />
+
+        <select
+          value={wordleSourceFields.wordleSourceType}
+          onChange={(e) => onChangeWordleSource(e)}
+        >
+          {wordleSourceMenu}
+        </select>
+
+        <button onClick={() => onSubmitWordleSourceInput(wordleSourceFields)} style={{marginLeft: "5px"}}>
+          Confirm
+        </button>
+      </div>
+
       {renderResult}
       <WordleBoard
         wordleArr={wordleArr}

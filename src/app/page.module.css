@@ -17,15 +17,6 @@
 
 .mode {
   position: absolute;
-  top: 0;
-  right: 0;
-  border: 0;
-  border-radius: 2px;
-  padding: 2px;
-}
-
-.mode, .mode:hover, .mode:active, .mode:visited {
-  background-color: chocolate;
 }
 
 .result {
@@ -44,7 +35,7 @@
 .author {
   text-decoration: none;
   text-align: center;
-  color: chocolate;
+  color: var(--orange-color);
   padding: 10px;
 }
 
