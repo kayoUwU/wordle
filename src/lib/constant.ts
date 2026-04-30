@@ -11,3 +11,6 @@ export const DEMO_WORD_LIST = ["hello", "world", "color", "stone", "train","whit
 export const CSS_ROOT_NAME = ":root";
 export const CSS_MAX_COL_PROP_NAME = "--max-column";
 export const CSS_MAX_ROW_PROP_NAME = "--max-row";
+
+export const WORDLE_HINT_OLDEST_DATE = "2021-06-19";
+export const NY_TIMES_OLDEST_DATE = "2021-06-19";

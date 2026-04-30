@@ -2,7 +2,7 @@ import { REQUEST_URL } from "@/lib/apiUrl";
 import { REQ_TYPES, RES_TYPES } from "@/entity/api/wordleAnswer";
 import { DEMO_WORD_LIST } from "@/lib/constant";
 import { dateStringToDate, validateDateStringFormat } from "@/lib/utils";
-import { objToSearchParams } from "./apiUtils";
+import { checkNYTimesDateRange, checkWordleHintsDateRange, objToSearchParams } from "./apiUtils";
 
 export type GetWordleReqFuncType = (
   dateStr: string,
@@ -13,6 +13,10 @@ export const getNYTimeWordByDate: GetWordleReqFuncType = async (
   dateStr: string,
 ): Promise<string | undefined> => {
   if (!validateDateStringFormat(dateStr)) {
+    return undefined;
+  }
+  
+  if(!checkNYTimesDateRange(dateStr)){
     return undefined;
   }
   
@@ -39,6 +43,7 @@ export const getNYTimeWordByDate: GetWordleReqFuncType = async (
   return (json as RES_TYPES.NyTimesWordRes).solution;
 };
 
+ // result for day = (today - 2days)
 export const getWordleHintsWordLatest: GetWordleReqFuncType = async (
   _: string,
 ): Promise<string | undefined> => {
@@ -51,6 +56,8 @@ export const getWordleHintsWordLatest: GetWordleReqFuncType = async (
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
+      // Send the key injected during the CI/CD build process
+      'X-App-Internal': process.env.NEXT_PUBLIC_API_KEY || ''
     },
   });
 
@@ -73,6 +80,10 @@ export const getWordleHintsWordByDate: GetWordleReqFuncType = async (
     return undefined;
   }
 
+  if(!checkWordleHintsDateRange(dateStr)){
+    return undefined;
+  }
+
   const params : REQ_TYPES.GetWordleHintsReq = {isLatest: false, dateStr};
   const query = objToSearchParams(params);
 
@@ -82,6 +93,8 @@ export const getWordleHintsWordByDate: GetWordleReqFuncType = async (
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
+      // Send the key injected during the CI/CD build process
+      'X-App-Internal': process.env.NEXT_PUBLIC_API_KEY || ''
     },
   });
 

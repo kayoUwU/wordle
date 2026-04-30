@@ -183,10 +183,6 @@ export function useGameManager() {
     }
   },[resetGame, wordleDate, wordleSourceType]);
 
-  const onChangeWordleDate = useCallback((value:string)=>{
-    console.log("value, ",value);
-  },[]);
-
   const onSubmit = useCallback(() => {
     if (gameStatus === GameStatus.Status.TOBE_SUBMIT) {
       setIsWaiting(true);
@@ -422,6 +418,5 @@ export function useGameManager() {
     modeType,
     initializeWordleSourceInput,
     onSubmitWordleSourceInput,
-    onChangeWordleDate,
   };
 }

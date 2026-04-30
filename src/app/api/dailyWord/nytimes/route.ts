@@ -2,8 +2,9 @@ import { PARTY3RD_REQUEST_URL } from "@/lib/apiUrl";
 import { REQ_TYPES, RES_TYPES } from "@/entity/api/wordleAnswer";
 import { NextRequest, NextResponse } from "next/server";
 import { GetNYTimesDailyWordSearchParams } from "@/entity/api/wordleAnswer/apiReq";
-import { blockDirectBrowserAccess } from "@/lib/apiUtils";
+import { blockDirectBrowserAccess, checkNYTimesDateRange } from "@/lib/apiUtils";
 import { validateDateStringFormat } from "@/lib/utils";
+import { revalidateTag } from "next/cache";
 
 // undefined = no found
 const getNYCDailyWord = async (
@@ -19,11 +20,14 @@ const getNYCDailyWord = async (
         Accept: "application/json",
         "Content-Type": "application/json",
       },
+      cache: 'force-cache',
+      next: { tags: ['nytimes-by-date',`nytimes-date-${req.dateStr}`] } 
     });
 
     const json = await res.json();
     console.log(`getNYCDailyWord res solution: ${json.solution}, `, json);
     if (json.status && json.status === "ERROR") {
+      revalidateTag(`nytimes-date-${req.dateStr}`);
       return undefined;
     }
     return json as RES_TYPES.NyTimesWordRes;
@@ -33,17 +37,22 @@ const getNYCDailyWord = async (
   }
 };
 
-//TODO cahce? https://nextjs.org/docs/app/getting-started/caching#working-with-runtime-apis
+// cahce https://nextjs.org/docs/app/guides/caching-without-cache-components
 export async function GET(req: NextRequest) {
   try {
-    blockDirectBrowserAccess(req);
+    if(blockDirectBrowserAccess(req)){
+      return NextResponse.json(
+        { error: "Direct access forbidden" },
+        { status: 403 },
+      );
+    }
 
     // Parse the request 
     const { searchParams } = req.nextUrl;
 
     const dateStr = searchParams.get(GetNYTimesDailyWordSearchParams.dateStr);
     if(dateStr === undefined || dateStr === null){
-      return NextResponse.json({ error: 'missing params: dateStr' }, {status: 200})
+      return NextResponse.json({ error: 'missing params: dateStr' }, {status: 400})
     }
 
     // Validate date format (YYYY-MM-DD)
@@ -51,15 +60,25 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid dateStr format' }, { status: 400 });
     }
 
+    if(!checkNYTimesDateRange(dateStr)){
+      return NextResponse.json({ error: 'no solution found' }, {status: 404});
+    }
+      
+
     // Proxy the request to the real external API
     const res = await getNYCDailyWord({ dateStr });
 
     if (res === undefined) {
-      return NextResponse.json({ error: 'no solution found' }, {status: 200})
+      return NextResponse.json({ error: 'no solution found' }, {status: 404})
     }
 
     //headers: { "Content-Type": "application/json" }
-    return NextResponse.json(res,{status: 200});
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#immutable
+    return NextResponse.json(res,{status: 200,
+      headers: {
+        'Cache-Control': 'Cache-Control: public, max-age=604800, immutable',
+      },
+    });
   } catch (error) {
     return NextResponse.json({ error: `proxy error ${error}` }, {status: 500})
   }
