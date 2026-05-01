@@ -1,0 +1,29 @@
+.tips-dialog {
+  align-self: start;
+  justify-self: center;
+  
+  border: none;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* The Backdrop (background dimming) */
+.tips-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.tips-dialog-content {
+  padding: 20px;
+  text-align: left;
+}
+
+.tips-dialog-content ul {
+  padding: 10px 0px 10px 20px;
+}
+
+.tips-dialog-content button {
+  width: 100%;
+}

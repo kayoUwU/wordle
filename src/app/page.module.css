@@ -15,8 +15,10 @@
   height: 80px;
 }
 
-.mode {
+.tips-button {
   position: absolute;
+  padding: 5px;
+  border-radius: 10px;
 }
 
 .result {

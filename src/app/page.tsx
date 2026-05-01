@@ -7,6 +7,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import Image from "next/image";
@@ -19,6 +20,7 @@ import WordleBoard from "./components/wordleBoard";
 import { MODE } from "@/entity/enum/modeType";
 import { WordleSourceFields } from "@/entity/WordleSourceFields";
 import { WordleSourceType, WORDLE_SOURCE } from "@/entity/enum/wordleSource";
+import TipsModal from "./components/tipsModal";
 
 function Home() {
   const {
@@ -50,7 +52,8 @@ function Home() {
     [],
   );
 
-  const [isFocusWordleDateInput,setFocusWordleDateInput] = useState<boolean>(false);
+  const [isFocusWordleDateInput, setFocusWordleDateInput] =
+    useState<boolean>(false);
 
   const handleKeyDownEvent = useCallback(
     (e: KeyboardEvent) => {
@@ -63,7 +66,7 @@ function Home() {
   );
 
   useEffect(() => {
-    if(!isFocusWordleDateInput){
+    if (!isFocusWordleDateInput) {
       window.addEventListener("keydown", handleKeyDownEvent);
 
       // call before the effect re-runs, such as isFocusWordleDateInput = false
@@ -75,16 +78,16 @@ function Home() {
 
   //change focus for date input
   const onFocusWordleDateInput = useCallback(() => {
-    if(!isFocusWordleDateInput){
+    if (!isFocusWordleDateInput) {
       setFocusWordleDateInput(true);
     }
-  },[isFocusWordleDateInput]);
+  }, [isFocusWordleDateInput]);
 
-  const onBlurWordleDateInput = useCallback(()=>{
-    if(isFocusWordleDateInput){
+  const onBlurWordleDateInput = useCallback(() => {
+    if (isFocusWordleDateInput) {
       setFocusWordleDateInput(false);
     }
-  },[isFocusWordleDateInput]);
+  }, [isFocusWordleDateInput]);
 
   const onChangeWordleSource = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
@@ -100,7 +103,10 @@ function Home() {
           wordleSourceFields.copy({ wordleSourceType: newWordleSource }),
         );
       } else {
-        console.error("onChangeWordleSource: Invalid WordleSourceType:", choice);
+        console.error(
+          "onChangeWordleSource: Invalid WordleSourceType:",
+          choice,
+        );
       }
     },
     [wordleSourceFields],
@@ -129,6 +135,24 @@ function Home() {
     );
   }, [currentTransitionDelay, gameStatus, isAnswerLoading, isWaiting]);
 
+  const [isTipsOpen, setIsTipsOpen] = useState(false);
+
+  const tipsDialogRef = useRef<HTMLDialogElement>(null);
+
+  const onShowTipsModal = useCallback(() => {
+    if (!isTipsOpen) {
+      setIsTipsOpen(true);
+      tipsDialogRef.current?.showModal();
+    }
+  }, [isTipsOpen]);
+
+  const onCloseTipsModal = useCallback(() => {
+    if (isTipsOpen) {
+      setIsTipsOpen(false);
+      tipsDialogRef.current?.close();
+    }
+  }, [isTipsOpen]);
+
   return (
     <main>
       <div className={styles.title}>
@@ -143,25 +167,42 @@ function Home() {
           />
           ordle
         </div>
-        <button onClick={onChangeMode} className={styles.mode}>
-          {MODE[modeType].name}
+        <button onClick={onShowTipsModal} className={styles["tips-button"]}>
+          ?
         </button>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <TipsModal
+        tipsDialogRef={tipsDialogRef}
+        onCloseTipsModal={onCloseTipsModal}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <input
           type="date"
-          value={WORDLE_SOURCE[wordleSourceFields.wordleSourceType].isDisableDate?"":wordleSourceFields.wordleDate}
-          placeholder="YYYY-MM-DD" 
-          disabled={WORDLE_SOURCE[wordleSourceFields.wordleSourceType].isDisableDate}
+          value={
+            WORDLE_SOURCE[wordleSourceFields.wordleSourceType].isDisableDate
+              ? ""
+              : wordleSourceFields.wordleDate
+          }
+          placeholder="YYYY-MM-DD"
+          disabled={
+            WORDLE_SOURCE[wordleSourceFields.wordleSourceType].isDisableDate
+          }
           onChange={(e) => {
             if (wordleSourceFields.wordleDate !== e.target.value)
               setWordleSourceFields(
                 wordleSourceFields.copy({ wordleDate: e.target.value }),
               );
           }}
-          onFocus={()=>onFocusWordleDateInput()}
-          onBlur={()=>onBlurWordleDateInput()}
+          onFocus={() => onFocusWordleDateInput()}
+          onBlur={() => onBlurWordleDateInput()}
         />
 
         <select
@@ -171,8 +212,15 @@ function Home() {
           {wordleSourceMenu}
         </select>
 
-        <button onClick={() => onSubmitWordleSourceInput(wordleSourceFields)} style={{marginLeft: "5px"}}>
+        <button
+          onClick={() => onSubmitWordleSourceInput(wordleSourceFields)}
+          style={{ marginLeft: "5px" }}
+        >
           Confirm
+        </button>
+
+        <button onClick={onChangeMode} style={{ marginLeft: "10px", ... MODE[modeType].resultStyle }}>
+          {MODE[modeType].name}
         </button>
       </div>
 
@@ -189,7 +237,7 @@ function Home() {
         rel="noopener noreferrer"
         className={styles.author}
       >
-        @Kayou
+        &copy; 2024–{new Date().getFullYear()} Kayou W.
       </a>
     </main>
   );

@@ -118,6 +118,23 @@
     animation-fill-mode: both;
 }
 
+@keyframes slideUp {
+    from {
+    transform: translateY(20px);
+    opacity: 0;
+    }
+    to {
+    transform: translateY(0);
+    opacity: 1;
+    }
+}
+
+.slideUp {
+    animation-name: slideUp;
+    animation-duration: 0.3s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+}
 
 @keyframes rainbow {
     0% {

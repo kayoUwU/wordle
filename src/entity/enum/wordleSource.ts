@@ -43,7 +43,7 @@ export const WORDLE_SOURCE : {[key in WordleSourceType]:WordleSource} = {
     }),
     [WordleSourceType.DEMO] : new WordleSource({
         name: 'demo',
-        displayName: 'demo',
+        displayName: 'Demo',
         isDisableDate:false,
         getWordleReqFunc: GetWordleReqFuncs.getDemoWordByDate
     }),
