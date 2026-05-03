@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Wordle UI Project",
   description: "Guess Word like Wordle Game",
-  keywords: ["wordle"],
+  keywords: ["wordle ui"],
   icons: {
     icon: WEB_ICON,
   },

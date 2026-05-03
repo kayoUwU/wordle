@@ -1,4 +1,4 @@
-.tips-dialog {
+.modal {
   align-self: start;
   justify-self: center;
   
@@ -10,20 +10,21 @@
 }
 
 /* The Backdrop (background dimming) */
-.tips-dialog::backdrop {
+.modal::backdrop {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(2px);
 }
 
-.tips-dialog-content {
+.modal > div {
   padding: 20px;
   text-align: left;
 }
 
-.tips-dialog-content ul {
-  padding: 10px 0px 10px 20px;
-}
-
-.tips-dialog-content button {
+.modal button {
   width: 100%;
 }
+
+.modal ul {
+  padding: 1em 0em 1em 1em;
+}
+

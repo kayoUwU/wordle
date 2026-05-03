@@ -20,7 +20,9 @@ import WordleBoard from "./components/wordleBoard";
 import { MODE } from "@/entity/enum/modeType";
 import { WordleSourceFields } from "@/entity/WordleSourceFields";
 import { WordleSourceType, WORDLE_SOURCE } from "@/entity/enum/wordleSource";
-import TipsModal from "./components/tipsModal";
+import { ModalContentInput, tipsModalContent } from "./components/modal/modalContent";
+import Modal from "./components/modal/modal";
+import Footer from "./components/footer";
 
 function Home() {
   const {
@@ -135,23 +137,32 @@ function Home() {
     );
   }, [currentTransitionDelay, gameStatus, isAnswerLoading, isWaiting]);
 
-  const [isTipsOpen, setIsTipsOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContentInput, setModalContentInput] = useState<ModalContentInput>(
+    tipsModalContent
+  );
 
-  const tipsDialogRef = useRef<HTMLDialogElement>(null);
+  const modalRef = useRef<HTMLDialogElement>(null);
 
+  const onCloseModal = useCallback(() => {
+    if (isModalOpen) {
+      setIsModalOpen(false);
+      modalRef.current?.close();
+    }
+  }, [isModalOpen]);
+
+  const onShowModal = useCallback((input: ModalContentInput) => {
+    if (!isModalOpen) {
+      setModalContentInput(input);
+      setIsModalOpen(true);
+      modalRef.current?.showModal();
+    }
+  }, [isModalOpen]);
+  
   const onShowTipsModal = useCallback(() => {
-    if (!isTipsOpen) {
-      setIsTipsOpen(true);
-      tipsDialogRef.current?.showModal();
-    }
-  }, [isTipsOpen]);
+    onShowModal(tipsModalContent);
+  }, [onShowModal]);
 
-  const onCloseTipsModal = useCallback(() => {
-    if (isTipsOpen) {
-      setIsTipsOpen(false);
-      tipsDialogRef.current?.close();
-    }
-  }, [isTipsOpen]);
 
   return (
     <main>
@@ -165,24 +176,22 @@ function Home() {
             className={isWaiting || isAnswerLoading ? "rotate " : undefined}
             priority
           />
-          ordle
+          ordle UI
         </div>
-        <button onClick={onShowTipsModal} className={styles["tips-button"]}>
+        <button onClick={onShowTipsModal} className={styles.tipsButton}>
           ?
         </button>
       </div>
 
-      <TipsModal
-        tipsDialogRef={tipsDialogRef}
-        onCloseTipsModal={onCloseTipsModal}
+      <Modal
+        modalRef={modalRef}
+        onCloseModal={onCloseModal} 
+        modalTitle={modalContentInput.title}
+        modalContent={modalContentInput.content}      
       />
 
       <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
+        className={styles.inputGroup}
       >
         <input
           type="date"
@@ -214,12 +223,11 @@ function Home() {
 
         <button
           onClick={() => onSubmitWordleSourceInput(wordleSourceFields)}
-          style={{ marginLeft: "5px" }}
         >
           Confirm
         </button>
 
-        <button onClick={onChangeMode} style={{ marginLeft: "10px", ... MODE[modeType].resultStyle }}>
+        <button onClick={onChangeMode} style={{ marginLeft: "1em", ... MODE[modeType].resultStyle }}>
           {MODE[modeType].name}
         </button>
       </div>
@@ -231,14 +239,8 @@ function Home() {
         animationDelay={currentTransitionDelay}
       />
       <Keyboard onKeyDown={onKeyDown} keybroadData={keybroadData} />
-      <a
-        href="https://kayouwu.github.io"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={styles.author}
-      >
-        &copy; 2024–{new Date().getFullYear()} Kayou W.
-      </a>
+      
+      <Footer onShowModal={onShowModal}/>
     </main>
   );
 }

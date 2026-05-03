@@ -12,7 +12,7 @@ import {
 } from "./constant";
 import { MODE, ModeType } from "@/entity/enum/modeType";
 import { useWordAnswer } from "./useWordAnswer";
-import { WordleSourceType } from "@/entity/enum/wordleSource";
+import { DEFAULT_WORDLER_SOURCE_TYPE, WordleSourceType } from "@/entity/enum/wordleSource";
 import { WordleSourceFields } from "@/entity/WordleSourceFields";
 import { dateToDateString } from "./utils";
 
@@ -87,7 +87,7 @@ export function useGameManager() {
   const [isWaiting, setIsWaiting] = useState<boolean>();
 
   const [modeType, setModeType] = useState<ModeType>(ModeType.DEFAULT);
-  const [wordleSourceType, setWordleSourceType] = useState<WordleSourceType>(WordleSourceType.DEFAULT);
+  const [wordleSourceType, setWordleSourceType] = useState<WordleSourceType>(DEFAULT_WORDLER_SOURCE_TYPE);
   const [wordleDate, setWordleDate] = useState<string>(() => dateToDateString(new Date()));
   const {
     wordSolutionChars,

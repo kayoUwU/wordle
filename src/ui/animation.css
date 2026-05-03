@@ -120,12 +120,12 @@
 
 @keyframes slideUp {
     from {
-    transform: translateY(20px);
-    opacity: 0;
+        opacity: 0;
+        transform: translateY(20%);
     }
     to {
-    transform: translateY(0);
-    opacity: 1;
+        opacity: 1;
+        transform: translateY(0%);
     }
 }
 

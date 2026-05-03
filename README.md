@@ -69,3 +69,9 @@ After Serving, Open [http://localhost:3000](http://localhost:3000) with your bro
     - `WEB_BASE_PATH` with base path of this github page (i.e. `/wordle`).
 2. Run Github action `Deploy Next.js site to Pages`
 3. After deploy, Open the Gihub page (i.e. [https://kayouwu.github.io/wordle](https://kayouwu.github.io/wordle)) with your browser to see the result.
+
+## Legal & Attribution
+- **Design & Code**: © 2024-now [Kayou W.](https://kayouwu.github.io).
+- **Data Sourcing**: Answers and definitions are fetched via a Next.js proxy. 
+- **Documentation**: Detailed attribution regarding specific data usage is integrated into the **"How to Play"** modal within the UI.
+- **Disclaimer**: Not affiliated with the The New York Times Company; Wordle is a trademark of The New York Times Company.
