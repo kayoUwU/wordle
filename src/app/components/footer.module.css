@@ -1,0 +1,38 @@
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px solid var(--grey-color);
+  font-size: 0.7em;
+}
+
+.author {
+  text-decoration: none;
+  text-align: center;
+  color: var(--orange-color);
+  padding: 10px;
+}
+
+.linkButtonGroup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: white;
+  padding: 0;
+  cursor: pointer;
+}
+
+
+@media (max-height: 768px), (max-width: 640px) {
+  /* .author {
+    position: absolute;
+    top: 0;
+    left: 0;
+  } */
+}

@@ -1,0 +1,30 @@
+.modal {
+  align-self: start;
+  justify-self: center;
+  
+  border: none;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* The Backdrop (background dimming) */
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.modal > div {
+  padding: 20px;
+  text-align: left;
+}
+
+.modal button {
+  width: 100%;
+}
+
+.modal ul {
+  padding: 1em 0em 1em 1em;
+}
+

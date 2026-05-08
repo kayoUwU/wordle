@@ -15,17 +15,18 @@
   height: 80px;
 }
 
-.mode {
-  position: absolute;
-  top: 0;
-  right: 0;
-  border: 0;
-  border-radius: 2px;
-  padding: 2px;
+.tipsButton {
+  align-self: flex-start;
+  padding: 5px;
+  border-radius: 10px;
 }
 
-.mode, .mode:hover, .mode:active, .mode:visited {
-  background-color: chocolate;
+.inputGroup {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 5px;
 }
 
 .result {
@@ -41,17 +42,8 @@
   opacity: 0;
 }
 
-.author {
-  text-decoration: none;
-  text-align: center;
-  color: chocolate;
-  padding: 10px;
-}
-
-@media (max-height: 768px), (max-width: 640px) {
-  .author {
-    position: absolute;
-    top: 0;
-    left: 0;
+@media (max-width: 640px) {
+  .inputGroup {
+    padding: 0 20px;
   }
 }
