@@ -14,13 +14,16 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import Keyboard from "./components/keyboard";
 import { GameStatus } from "@/entity/enum/gameStatus";
-import { LOGO } from "@/lib/constant";
+import { IS_DISABLE_SERVER_API, LOGO } from "@/lib/constant";
 import { useGameManager } from "@/lib/useGameManager";
 import WordleBoard from "./components/wordleBoard";
 import { MODE } from "@/entity/enum/modeType";
 import { WordleSourceFields } from "@/entity/WordleSourceFields";
 import { WordleSourceType, WORDLE_SOURCE } from "@/entity/enum/wordleSource";
-import { ModalContentInput, tipsModalContent } from "./components/modal/modalContent";
+import {
+  ModalContentInput,
+  tipsModalContent,
+} from "./components/modal/modalContent";
 import Modal from "./components/modal/modal";
 import Footer from "./components/footer";
 
@@ -138,9 +141,8 @@ function Home() {
   }, [currentTransitionDelay, gameStatus, isAnswerLoading, isWaiting]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContentInput, setModalContentInput] = useState<ModalContentInput>(
-    tipsModalContent
-  );
+  const [modalContentInput, setModalContentInput] =
+    useState<ModalContentInput>(tipsModalContent);
 
   const modalRef = useRef<HTMLDialogElement>(null);
 
@@ -151,18 +153,20 @@ function Home() {
     }
   }, [isModalOpen]);
 
-  const onShowModal = useCallback((input: ModalContentInput) => {
-    if (!isModalOpen) {
-      setModalContentInput(input);
-      setIsModalOpen(true);
-      modalRef.current?.showModal();
-    }
-  }, [isModalOpen]);
-  
+  const onShowModal = useCallback(
+    (input: ModalContentInput) => {
+      if (!isModalOpen) {
+        setModalContentInput(input);
+        setIsModalOpen(true);
+        modalRef.current?.showModal();
+      }
+    },
+    [isModalOpen],
+  );
+
   const onShowTipsModal = useCallback(() => {
     onShowModal(tipsModalContent);
   }, [onShowModal]);
-
 
   return (
     <main>
@@ -185,14 +189,12 @@ function Home() {
 
       <Modal
         modalRef={modalRef}
-        onCloseModal={onCloseModal} 
+        onCloseModal={onCloseModal}
         modalTitle={modalContentInput.title}
-        modalContent={modalContentInput.content}      
+        modalContent={modalContentInput.content}
       />
 
-      <div
-        className={styles.inputGroup}
-      >
+      <div className={styles.inputGroup}>
         <input
           type="date"
           value={
@@ -214,20 +216,26 @@ function Home() {
           onBlur={() => onBlurWordleDateInput()}
         />
 
-        <select
-          value={wordleSourceFields.wordleSourceType}
-          onChange={(e) => onChangeWordleSource(e)}
-        >
-          {wordleSourceMenu}
-        </select>
+        {IS_DISABLE_SERVER_API ? (
+          WORDLE_SOURCE[WordleSourceType.DEMO].displayName
+        ) : (
+          <select
+            value={wordleSourceFields.wordleSourceType}
+            onChange={(e) => onChangeWordleSource(e)}
+            disabled={IS_DISABLE_SERVER_API}
+          >
+            {wordleSourceMenu}
+          </select>
+        )}
 
-        <button
-          onClick={() => onSubmitWordleSourceInput(wordleSourceFields)}
-        >
+        <button onClick={() => onSubmitWordleSourceInput(wordleSourceFields)}>
           Confirm
         </button>
 
-        <button onClick={onChangeMode} style={{ marginLeft: "1em", ... MODE[modeType].resultStyle }}>
+        <button
+          onClick={onChangeMode}
+          style={{ marginLeft: "1em", ...MODE[modeType].resultStyle }}
+        >
           {MODE[modeType].name}
         </button>
       </div>
@@ -239,8 +247,8 @@ function Home() {
         animationDelay={currentTransitionDelay}
       />
       <Keyboard onKeyDown={onKeyDown} keybroadData={keybroadData} />
-      
-      <Footer onShowModal={onShowModal}/>
+
+      <Footer onShowModal={onShowModal} />
     </main>
   );
 }

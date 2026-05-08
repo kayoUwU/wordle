@@ -21,10 +21,11 @@ const configFunc = (phase, _) => {
         },
       },
     };
-    console.log("process.env.USE_EXPORT", process.env.USE_EXPORT);
-    if (process.env.USE_EXPORT === 'true') {
+    console.log("process.env.NEXT_PUBLIC_USE_EXPORT", process.env.NEXT_PUBLIC_USE_EXPORT);
+    if (process.env.NEXT_PUBLIC_USE_EXPORT === 'true') {
       config.output = 'export';
       config.distDir = 'out';
+      config.exclude = ['api']; //static page, no server
       config.images = { unoptimized: true };
     }
     if (process.env.NEXT_PUBLIC_BASE_PATH && process.env.NEXT_PUBLIC_BASE_PATH.trim() !== '') {
