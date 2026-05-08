@@ -1,37 +1,53 @@
-import { Result } from "@/entity/result";
+import { PARTY3RD_REQUEST_URL } from "@/lib/apiUrl";
+import { DictionaryRes } from "@/entity/api/res";
+import { WORDLE_SOURCE, WordleSourceType } from "@/entity/enum/wordleSource";
+import { WordleSourceFields } from "@/entity/WordleSourceFields";
+import { IS_DISABLE_SERVER_API } from "./constant";
 
-const api = "https://wordle-apis.vercel.app/api/validate";
+// true if word exist
+export async function dictionaryCheckReq(word: string): Promise<boolean> {
+  const url = `${PARTY3RD_REQUEST_URL.dictionaryApi}/${word.toLowerCase()}`;
 
-export async function dummyValidateReq(word: string) {
-  console.log('DEV:',word);
-  return new Result({
-    isvalidword: word.toUpperCase() === "VALID" ? false : true,
-    score: word.toUpperCase() === "SCORE" ? [2, 2, 2, 2, 2] : [0, 1, 2, 0, 1, 2],
-  });
-}
-
-export async function validateReq(word: string, isDev:boolean=false) {
-  if(isDev){
-    return dummyValidateReq(word);
-  }
   try {
-    const res = await fetch(api, {
-      method: "POST",
+    const res = await fetch(url, {
+      method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        guess: word,
-      }),
     });
-    const json = await res.json();
-    return new Result({
-      isvalidword: json?.is_valid_word || false,
-      score: json?.score || [],
-    });
+
+    const json = (await res.json()) as DictionaryRes;
+    if (json?.entries && json?.entries.length > 0) {
+      return true;
+    }
+    return false;
   } catch (err) {
-    console.warn("validateReq error", err);
+    console.error("wordCheckReq error", err);
+    throw err;
+  }
+}
+
+export async function getDailyWord(
+  query: WordleSourceFields,
+): Promise<string | undefined> {
+  try {
+    if (IS_DISABLE_SERVER_API) {
+      // just use demo
+      if (query.wordleSourceType === WordleSourceType.DEMO) {
+        return await WORDLE_SOURCE[WordleSourceType.DEMO].getWordleReqFunc(
+          query.wordleDate,
+        );
+      }
+      return undefined;
+    }
+
+    const res = await WORDLE_SOURCE[query.wordleSourceType].getWordleReqFunc(
+      query.wordleDate,
+    );
+    return res;
+  } catch (err) {
+    console.error("getDailyWord error", err);
     throw err;
   }
 }

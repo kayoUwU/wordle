@@ -1,16 +1,25 @@
 import { GameStatus } from "@/entity/enum/gameStatus";
 import { Keybroad, KeyCode } from "@/entity/keyCode";
 import { Wordle, WordleItem } from "@/entity/wordle";
-import { useCallback, useState } from "react";
-import { validateReq } from "./query";
+import { useCallback, useEffect, useState } from "react";
 import { ResultType } from "@/entity/enum/resultType";
-import { ANIMATION_MS, CSS_MAX_COL_PROP_NAME, CSS_MAX_ROW_PROP_NAME, CSS_ROOT_NAME, DEV_MODE_SEARCH } from "./constant";
+import {
+  ANIMATION_MS,
+  CSS_MAX_COL_PROP_NAME,
+  CSS_MAX_ROW_PROP_NAME,
+  CSS_ROOT_NAME,
+  DEV_MODE_SEARCH,
+} from "./constant";
 import { MODE, ModeType } from "@/entity/enum/modeType";
+import { useWordAnswer } from "./useWordAnswer";
+import { DEFAULT_WORDLER_SOURCE_TYPE, WordleSourceType } from "@/entity/enum/wordleSource";
+import { WordleSourceFields } from "@/entity/WordleSourceFields";
+import { dateToDateString } from "./utils";
 
 // Change Style
 function getUpdatedKeyObj(
   newGameStatus: GameStatus.Status,
-  currentTransitionDelay?: number | undefined
+  currentTransitionDelay?: number | undefined,
 ): Keybroad.DataType {
   if (newGameStatus === GameStatus.Status.TOBE_SUBMIT) {
     const Enter = new KeyCode();
@@ -35,7 +44,7 @@ function getUpdatedKeyObj(
 
 // Reset Style
 function getResetUpdatedKeyObj(
-  oldGameStatus: GameStatus.Status
+  oldGameStatus: GameStatus.Status,
 ): Keybroad.DataType {
   if (oldGameStatus === GameStatus.Status.TOBE_SUBMIT) {
     const Enter = new KeyCode();
@@ -60,22 +69,31 @@ function getResetUpdatedKeyObj(
 
 export function useGameManager() {
   const [wordleArr, setWordleArr] = useState<WordleItem[]>(() =>
-    Wordle.buildWordleArr()
+    Wordle.buildWordleArr(),
   );
   const [currentPosition, setCurrentPosition] = useState<number>(0);
   const [currentTransitionDelay, setCurrentTransitionDelay] =
     useState<number>(0);
 
   const [keybroadData, setKeybroadData] = useState<Keybroad.DataType>(() =>
-    Keybroad.buildKeyObject()
-  );
-  const [gameStatus, setGameStatus] = useState<GameStatus.Status>(
-    GameStatus.Status.IN_PROGRESS
+    Keybroad.buildKeyObject(),
   );
 
-  const [isWaiting, setIsWaiting] = useState<boolean>(false);
+  //use updateGameStatus instate of setGameStatus
+  const [gameStatus, setGameStatus] = useState<GameStatus.Status>(
+    GameStatus.Status.NO_SOLUTION,
+  );
+
+  const [isWaiting, setIsWaiting] = useState<boolean>();
 
   const [modeType, setModeType] = useState<ModeType>(ModeType.DEFAULT);
+  const [wordleSourceType, setWordleSourceType] = useState<WordleSourceType>(DEFAULT_WORDLER_SOURCE_TYPE);
+  const [wordleDate, setWordleDate] = useState<string>(() => dateToDateString(new Date()));
+  const {
+    wordSolutionChars,
+    isLoading: isAnswerLoading,
+    validateAnswer,
+  } = useWordAnswer(new WordleSourceFields(wordleSourceType, wordleDate));
 
   const updateGameStatus = useCallback(
     (newGameStatus: GameStatus.Status, transitionDelay: number = 0) => {
@@ -92,46 +110,86 @@ export function useGameManager() {
         }
       }
     },
-    [gameStatus]
+    [gameStatus],
   );
 
-  const resetGame = useCallback((modeType:ModeType) => {
-    setWordleArr(Wordle.buildWordleArr(modeType));
-    setCurrentPosition(0);
-    setCurrentTransitionDelay(0);
-    setKeybroadData(Keybroad.buildKeyObject());
-    updateGameStatus(GameStatus.Status.IN_PROGRESS);
-    setIsWaiting(false);
-  }, [updateGameStatus]);
+  useEffect(() => {
+    if (wordSolutionChars === null) {
+      updateGameStatus(GameStatus.Status.NO_SOLUTION);
+    } else if (
+      wordSolutionChars !== null &&
+      gameStatus === GameStatus.Status.NO_SOLUTION
+    ) {
+      updateGameStatus(GameStatus.Status.IN_PROGRESS);
+    }
+  }, [gameStatus, updateGameStatus, wordSolutionChars]);
 
-  const changeMode = useCallback(()=>{
-    if(document){
+  const resetGameWithModeType = useCallback(
+    (modeType: ModeType) => {
+      setWordleArr(Wordle.buildWordleArr(modeType));
+      setCurrentPosition(0);
+      setCurrentTransitionDelay(0);
+      setKeybroadData(Keybroad.buildKeyObject());
+      updateGameStatus(GameStatus.Status.IN_PROGRESS);
+      setIsWaiting(false);
+    },
+    [updateGameStatus],
+  );
+
+  const resetGame = useCallback(()=>{resetGameWithModeType(modeType)},[modeType, resetGameWithModeType]);
+
+  const onChangeMode = useCallback(() => {
+    if (document) {
       let newModeType = modeType;
-      if(modeType==ModeType.DEFAULT){
+      if (modeType == ModeType.DEFAULT) {
         newModeType = ModeType.HARD;
       } else {
         newModeType = ModeType.DEFAULT;
       }
 
       setModeType(newModeType);
-      resetGame(newModeType);
+      resetGameWithModeType(newModeType);
 
       const root = document.querySelector(CSS_ROOT_NAME) as HTMLElement;
-      if(root){
+      if (root) {
         const mode = MODE[newModeType];
-        root.style.setProperty(CSS_MAX_COL_PROP_NAME,mode.maxCol.toString());
-        root.style.setProperty(CSS_MAX_ROW_PROP_NAME,mode.maxRow.toString());
+        root.style.setProperty(CSS_MAX_COL_PROP_NAME, mode.maxCol.toString());
+        root.style.setProperty(CSS_MAX_ROW_PROP_NAME, mode.maxRow.toString());
       }
     }
-  },[modeType, resetGame]);
+  }, [modeType, resetGameWithModeType]);
+
+  const initializeWordleSourceInput = useCallback(() => {
+    return new WordleSourceFields (
+      wordleSourceType,
+      wordleDate,
+    );
+  },[wordleDate, wordleSourceType]);
+
+  const onSubmitWordleSourceInput = useCallback((input:WordleSourceFields) => {
+    let isChanged:boolean = false;
+    if(input.wordleSourceType!==wordleSourceType){
+      setWordleSourceType(input.wordleSourceType);
+      isChanged = true;
+    }
+
+    if(input.wordleDate !== wordleDate){
+      setWordleDate(input.wordleDate);
+      isChanged = true;
+    }
+    
+    if(isChanged){
+      resetGame();
+    }
+  },[resetGame, wordleDate, wordleSourceType]);
 
   const onSubmit = useCallback(() => {
     if (gameStatus === GameStatus.Status.TOBE_SUBMIT) {
       setIsWaiting(true);
       // valid word
-      validateReq(
+      validateAnswer(
         Wordle.getCurrentWord({ wordleArr, currentPosition, modeType }),
-        window?.location?.search !== DEV_MODE_SEARCH ? false : true
+        window?.location?.search !== DEV_MODE_SEARCH ? false : true,
       )
         .then((result) => {
           if (!result) {
@@ -143,8 +201,8 @@ export function useGameManager() {
           const keyClone = { ...keybroadData };
           const timestamp = Date.now();
           for (
-            let i = Wordle.getStartIndex(currentPosition,modeType), j = 0;
-            i < Wordle.getEndIndex(currentPosition,modeType);
+            let i = Wordle.getStartIndex(currentPosition, modeType), j = 0;
+            i < Wordle.getEndIndex(currentPosition, modeType);
             i++, j++
           ) {
             if (result.isvalidword && j >= result.score.length) {
@@ -152,7 +210,7 @@ export function useGameManager() {
             }
 
             const item: WordleItem = new WordleItem().cloneResult(
-              wordleClone[i]
+              wordleClone[i],
             );
 
             if (!result.isvalidword) {
@@ -169,7 +227,7 @@ export function useGameManager() {
               if (
                 ResultType.compare(
                   item.result,
-                  keyClone[item.text.toUpperCase()]?.result
+                  keyClone[item.text.toUpperCase()]?.result,
                 ) === 1
               ) {
                 const keyItem = new KeyCode()
@@ -182,7 +240,7 @@ export function useGameManager() {
               animationDelay += ANIMATION_MS;
               item.toInAcitve();
             }
-            
+
             wordleClone[i] = item;
             if (item.result !== ResultType.Status.CORRET) {
               win = false;
@@ -215,7 +273,7 @@ export function useGameManager() {
                 i++
               ) {
                 const item: WordleItem = new WordleItem().cloneResult(
-                  wordleClone[i]
+                  wordleClone[i],
                 );
                 if (i == nextPosition) {
                   item.isActiveWord = true;
@@ -238,7 +296,15 @@ export function useGameManager() {
           setIsWaiting(false);
         });
     }
-  }, [currentPosition, gameStatus, keybroadData, modeType, updateGameStatus, wordleArr]);
+  }, [
+    currentPosition,
+    gameStatus,
+    keybroadData,
+    modeType,
+    updateGameStatus,
+    validateAnswer,
+    wordleArr,
+  ]);
 
   // false = need prevent event
   const onKeyDown = useCallback(
@@ -256,7 +322,7 @@ export function useGameManager() {
         }
 
         const item: WordleItem = new WordleItem().cloneResult(
-          wordleArr[currentPosition]
+          wordleArr[currentPosition],
         );
         item.text = key.toUpperCase();
         item.isActiveWord = false;
@@ -272,7 +338,7 @@ export function useGameManager() {
           // update next word style
           setCurrentPosition(nextPosition);
           const nextItem: WordleItem = new WordleItem().cloneResult(
-            wordleArr[nextPosition]
+            wordleArr[nextPosition],
           );
           nextItem.isActiveWord = true;
           wordleArr[nextPosition] = nextItem;
@@ -296,14 +362,14 @@ export function useGameManager() {
 
         //reset current key style
         const item: WordleItem = new WordleItem().cloneResult(
-          wordleArr[currentPosition]
+          wordleArr[currentPosition],
         );
         item.isActiveWord = false;
         wordleArr[currentPosition] = item;
 
         //back 1 word
         const prevItem: WordleItem = new WordleItem().cloneResult(
-          wordleArr[prevPosition]
+          wordleArr[prevPosition],
         );
         prevItem.text = "";
         prevItem.isActiveWord = true;
@@ -323,22 +389,34 @@ export function useGameManager() {
         onSubmit();
         return true;
       } else if (key === "F5" && gameStatus === GameStatus.Status.LOSS) {
-        resetGame(modeType);
+        resetGame();
         return true;
       }
       return false;
     },
-    [currentPosition, gameStatus, isWaiting, modeType, onSubmit, resetGame, updateGameStatus, wordleArr]
+    [
+      currentPosition,
+      gameStatus,
+      isWaiting,
+      modeType,
+      onSubmit,
+      resetGame,
+      updateGameStatus,
+      wordleArr,
+    ],
   );
 
   return {
     wordleArr,
     keybroadData,
     currentTransitionDelay,
+    isAnswerLoading,
     isWaiting,
     gameStatus,
     onKeyDown,
-    changeMode,
+    onChangeMode,
     modeType,
+    initializeWordleSourceInput,
+    onSubmitWordleSourceInput,
   };
 }

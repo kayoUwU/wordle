@@ -7,11 +7,18 @@ import {WEB_ICON} from "@/lib/constant";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Wordle",
-  description: "Guess Word Game",
-  keywords: ["wordle"],
+  title: "Wordle UI Project",
+  description: "Guess Word like Wordle Game",
+  keywords: ["wordle ui"],
   icons: {
     icon: WEB_ICON,
+  },
+  //no index
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    noimageindex: true,
   },
 };
 
