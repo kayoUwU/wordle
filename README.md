@@ -2,6 +2,10 @@
 
 This project features a Wordle game UI developed by integrating a third-party API into the Next.js framework.
 
+branch
+- `dev`: for development.
+- `demo`: merge dev branch code to demo branch when a new features can be used in static demo page (exclude Server side api).
+
 ## How to play
 This game follow the rule of [Wordle](https://www.nytimes.com/games/wordle/index.html).
 
@@ -70,8 +74,12 @@ yarn serve
 ```
 After Serving, Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. 
 
-## Deploy in Github
+## Deploy
+
+### Deploy static page in Github page
 1. create `production` enviornment variable 
     - `WEB_BASE_PATH` with base path of this github page (i.e. `/wordle`).
-2. Run Github action `Deploy Next.js site to Pages`
+2. Github action `Deploy Next.js static site to Github Pages` (nextjs-export.workflow.yml) will be triggered automatically when a pull request closed on `demo` branch. Or Run it manually in Github.
 3. After deploy, Open the Gihub page (i.e. [https://kayouwu.github.io/wordle](https://kayouwu.github.io/wordle)) with your browser to see the result.
+
+demo answers can be view in `src\lib\constant.ts` => `DEMO_WORD_LIST`
