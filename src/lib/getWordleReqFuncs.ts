@@ -2,7 +2,7 @@ import { REQUEST_URL } from "@/lib/apiUrl";
 import { REQ_TYPES, RES_TYPES } from "@/entity/api/wordleAnswer";
 import { DEMO_WORD_LIST } from "@/lib/constant";
 import { dateStringToDate, validateDateStringFormat } from "@/lib/utils";
-import { checkNYTimesDateRange, checkWordleHintsDateRange, objToSearchParams } from "./apiUtils";
+import { checkNYTimesDateRange, checkWordleHintsDateRange, jsonApiReqBase, objToSearchParams } from "./apiUtils";
 
 export type GetWordleReqFuncType = (
   dateStr: string,
@@ -24,23 +24,10 @@ export const getNYTimeWordByDate: GetWordleReqFuncType = async (
   const query = objToSearchParams(params);
 
   // cross origin use Proxy
-  const res = await fetch(`${REQUEST_URL.nytimesWordleApi}?${query}`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      // Send the key injected during the CI/CD build process
-      'X-App-Internal': process.env.NEXT_PUBLIC_API_KEY || ''
-    },
-  });
+  const json = await jsonApiReqBase(`${REQUEST_URL.nytimesWordleApi}?${query}`) as RES_TYPES.NyTimesWordRes;
 
-  const json = await res.json();
   console.log("getNYTimeWordByDate %s res: ", dateStr, json);
-
-  if (json.error) {
-    return undefined;
-  }
-  return (json as RES_TYPES.NyTimesWordRes).solution;
+  return json.solution;
 };
 
  // result for day = (today - 2days)
@@ -51,24 +38,9 @@ export const getWordleHintsWordLatest: GetWordleReqFuncType = async (
   const query = objToSearchParams(params);
 
   // cross origin use Proxy
-  const res = await fetch(`${REQUEST_URL.wordlehintsApi}?${query}`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      // Send the key injected during the CI/CD build process
-      'X-App-Internal': process.env.NEXT_PUBLIC_API_KEY || ''
-    },
-  });
+  const json = await jsonApiReqBase(`${REQUEST_URL.wordlehintsApi}?${query}`) as RES_TYPES.wordlerHintsResultItem;
 
-  const json = (await res.json()) as RES_TYPES.wordlerHintsResultItem;
   console.log("getWordleHintsWordLatest res: ", json);
-
-  if (json.error) {
-    return undefined;
-  }
-
-
   return json.answer;
 };
 
@@ -88,24 +60,9 @@ export const getWordleHintsWordByDate: GetWordleReqFuncType = async (
   const query = objToSearchParams(params);
 
   // cross origin use Proxy
-  const res = await fetch(`${REQUEST_URL.wordlehintsApi}?${query}`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      // Send the key injected during the CI/CD build process
-      'X-App-Internal': process.env.NEXT_PUBLIC_API_KEY || ''
-    },
-  });
-
-  const json = (await res.json()) as RES_TYPES.WordleHintsRes;
+  const json = await jsonApiReqBase(`${REQUEST_URL.wordlehintsApi}?${query}`) as RES_TYPES.WordleHintsRes;
+  
   console.log("getWordleHintsWordByDate %s res: ", dateStr, json);
-
-  //update may not be today
-  if (json.error || json.total == 0) {
-    return undefined;
-  }
-
   return json.results[0].answer;
 };
 

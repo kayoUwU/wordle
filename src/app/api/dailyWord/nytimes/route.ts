@@ -2,9 +2,10 @@ import { PARTY3RD_REQUEST_URL } from "@/lib/apiUrl";
 import { REQ_TYPES, RES_TYPES } from "@/entity/api/wordleAnswer";
 import { NextRequest, NextResponse } from "next/server";
 import { GetNYTimesDailyWordSearchParams } from "@/entity/api/wordleAnswer/apiReq";
-import { blockDirectBrowserAccess, checkNYTimesDateRange } from "@/lib/apiUtils";
+import { checkNYTimesDateRange } from "@/lib/apiUtils";
 import { validateDateStringFormat } from "@/lib/utils";
 import { revalidateTag } from "next/cache";
+import { blockDirectAccess } from "@/lib/server/serverUtils";
 
 // undefined = no found
 const getNYCDailyWord = async (
@@ -40,11 +41,9 @@ const getNYCDailyWord = async (
 // cahce https://nextjs.org/docs/app/guides/caching-without-cache-components
 export async function GET(req: NextRequest) {
   try {
-    if(blockDirectBrowserAccess(req)){
-      return NextResponse.json(
-        { error: "Direct access forbidden" },
-        { status: 403 },
-      );
+    const direct = blockDirectAccess(req);
+    if(!direct.isValid){
+      return direct.response;
     }
 
     // Parse the request 

@@ -1,7 +1,8 @@
 import { RES_TYPES } from "@/entity/api/wordleAnswer";
 import { GetWordleHintsSearchParams } from "@/entity/api/wordleAnswer/apiReq";
 import { PARTY3RD_REQUEST_URL } from "@/lib/apiUrl";
-import { blockDirectBrowserAccess, checkWordleHintsDateRange } from "@/lib/apiUtils";
+import { checkWordleHintsDateRange } from "@/lib/apiUtils";
+import { blockDirectAccess } from "@/lib/server/serverUtils";
 import { validateDateStringFormat } from "@/lib/utils";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
@@ -52,11 +53,9 @@ const getWordleHintsWordByDate = async (
 
 export async function GET(req: NextRequest) {
   try {
-    if(blockDirectBrowserAccess(req)){
-      return NextResponse.json(
-        { error: "Direct access forbidden" },
-        { status: 403 },
-      );
+    const direct = blockDirectAccess(req);
+    if(!direct.isValid){
+      return direct.response;
     }
 
     // Parse the request 
