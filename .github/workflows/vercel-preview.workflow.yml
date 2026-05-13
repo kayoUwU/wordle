@@ -4,10 +4,14 @@ env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
-  push:
-    branches-ignore:
-      - demo
-      - prod
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+  # push:
+  #   branches-ignore:
+  #     - demo
+  #     - prod
+
 jobs:
   Deploy-Preview:
     runs-on: ubuntu-latest
