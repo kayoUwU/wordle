@@ -48,6 +48,6 @@ export async function getDailyWord(
     return res;
   } catch (err) {
     console.error("getDailyWord error", err);
-    throw err;
+    return undefined;
   }
 }

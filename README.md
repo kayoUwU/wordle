@@ -77,9 +77,19 @@ After Serving, Open [http://localhost:3000](http://localhost:3000) with your bro
 ## Deploy
 
 ### Deploy static page in Github page
-1. create `production` enviornment variable 
+1. create `production` enviornment variable in Github
     - `WEB_BASE_PATH` with base path of this github page (i.e. `/wordle`).
 2. Github action `Deploy Next.js static site to Github Pages` (nextjs-export.workflow.yml) will be triggered automatically when a pull request closed on `demo` branch. Or Run it manually in Github.
 3. After deploy, Open the Gihub page (i.e. [https://kayouwu.github.io/wordle](https://kayouwu.github.io/wordle)) with your browser to see the result.
 
 demo answers can be view in `src\lib\constant.ts` => `DEMO_WORD_LIST`
+
+### Deploy on Vercel
+1. create vercel project. Framework Preset with `Next.js`
+2. In Github, create `vercel` enviornment variable 
+    - `VERCEL_ORG_ID`: team id in vercel
+    - `VERCEL_PROJECT_ID`: project id in vercel
+    - `VERCEL_TOKEN`: user [Vercel Access Token](https://vercel.com/kb/guide/how-do-i-use-a-vercel-api-access-token)
+3. Development: Github action `Vercel Preview Deployment` (vercel-preview.workflow.yml) will be triggered automatically when a commit push on branches other than `demo` and `prod`. Or Run it manually in Github.
+3. Production: Github action `Vercel Production Deployment` (vercel-production.workflow.yml) will be triggered automatically when a pull request closed on `prod` branch. Or Run it manually in Github.
+4. After deploy, Open the vercel site with your browser to see the result.
